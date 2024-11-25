@@ -67,8 +67,6 @@ Thumbs.db
 debug.log
 
 # Project specific
-data/*.json
-!data/routes.json
 uploads/
 temp/
 dist/
