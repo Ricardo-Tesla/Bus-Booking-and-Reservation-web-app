@@ -1,0 +1,65 @@
+<div class="container my-4">
+    <div class="card">
+        <div class="card-body">
+            <div class="text-center mb-4">
+                <h2 class="text-success">
+                    <i class="fas fa-check-circle"></i> Booking Confirmed!
+                </h2>
+            </div>
+
+            <div class="booking-details">
+                <h4>Booking Details:</h4>
+                <div class="row">
+                    <div class="col-md-6">
+                        <p><strong>Booking ID:</strong> {{booking.id}}</p>
+                        <p><strong>Passenger Name:</strong> {{booking.fullName}}</p>
+                        <p><strong>Selected Seats:</strong> 
+                            {{#each booking.seats}}
+                                {{this.number}} ({{capitalize this.type}}){{#unless @last}}, {{/unless}}
+                            {{/each}}
+                        </p>
+                    </div>
+                    <div class="col-md-6">
+                        <p><strong>Travel Date:</strong> {{formatDate booking.travelDate}}</p>
+                        <p><strong>Departure Time:</strong> {{booking.departureTime}}</p>
+                        <p><strong>Route:</strong> {{route.from}} to {{route.to}}</p>
+                    </div>
+                </div>
+
+                <div class="alert alert-info payment-notice mt-4">
+                    <h5><i class="fas fa-info-circle"></i> Payment Instructions:</h5>
+                    <ul class="mb-0">
+                        <li>Total Amount: <strong>KES {{totalAmount}}</strong></li>
+                        <li>Payment to be made in cash when boarding the bus</li>
+                        <li>Please arrive 30 minutes before departure time</li>
+                        <li>Keep this booking reference for verification: <strong>{{booking.id}}</strong></li>
+                    </ul>
+                </div>
+            </div>
+
+            <div class="text-center mt-4">
+                <a href="/" class="btn btn-primary">Back to Home</a>
+                <button onclick="window.print()" class="btn btn-secondary ms-2">
+                    <i class="fas fa-print"></i> Print Ticket
+                </button>
+            </div>
+        </div>
+    </div>
+</div>
+
+<style>
+    @media print {
+        .btn { display: none; }
+    }
+    .payment-notice {
+        background-color: #e8f4f8;
+        border-left: 4px solid #17a2b8;
+    }
+    .payment-notice ul {
+        list-style-type: none;
+        padding-left: 25px;
+    }
+    .booking-details p {
+        margin-bottom: 0.5rem;
+    }
+</style> 

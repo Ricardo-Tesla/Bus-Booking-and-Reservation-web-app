@@ -1,0 +1,40 @@
+<div class="container">
+    <div class="row justify-content-center">
+        <div class="col-md-6">
+            <div class="card">
+                <div class="card-body">
+                    <h5 class="card-title">Verify Booking</h5>
+                    <form id="verifyForm">
+                        <div class="mb-3">
+                            <label class="form-label">Booking Reference</label>
+                            <input type="text" 
+                                   class="form-control" 
+                                   id="bookingReference" 
+                                   placeholder="e.g., BK1234567890"
+                                   required
+                                   pattern="BK[A-Z0-9]{10}">
+                            <div class="form-text">Enter your booking reference number</div>
+                        </div>
+                        <div class="mb-3">
+                            <label class="form-label">Phone Number</label>
+                            <input type="tel" 
+                                   class="form-control" 
+                                   id="phoneNumber"
+                                   placeholder="Phone number used for booking"
+                                   required>
+                        </div>
+                        <button type="submit" class="btn btn-primary">Verify Booking</button>
+                    </form>
+                </div>
+            </div>
+
+            <!-- Booking Details (initially hidden) -->
+            <div id="bookingDetails" class="card mt-4" style="display: none;">
+                <div class="card-body">
+                    <h5 class="card-title">Booking Details</h5>
+                    <div id="bookingInfo"></div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div> 

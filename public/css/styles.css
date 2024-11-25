@@ -1,0 +1,318 @@
+.seat-map {
+    display: grid;
+    grid-template-columns: repeat(4, 1fr);
+    gap: 10px;
+    padding: 20px;
+    max-width: 500px;
+    margin: 0 auto;
+    background-color: #f8f9fa;
+    border-radius: 8px;
+}
+
+.seat {
+    position: relative;
+    width: 45px;
+    height: 45px;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    border: 2px solid #dee2e6;
+    border-radius: 8px;
+    cursor: pointer;
+    background-color: #ffffff;
+    transition: all 0.2s ease;
+    box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+}
+
+.seat:hover:not(.booked) {
+    transform: translateY(-2px);
+    box-shadow: 0 4px 8px rgba(0,0,0,0.1);
+}
+
+.seat-status {
+    font-size: 10px;
+    color: #fff;
+    position: absolute;
+    bottom: 2px;
+}
+
+.seat.vip {
+    border-color: #ffd700;
+    background-color: #fff9e6;
+}
+
+.seat.vip .seat-number {
+    color: #b8860b;
+}
+
+.seat.selected {
+    background-color: #28a745;
+    border-color: #28a745;
+}
+
+.seat.selected .seat-number {
+    color: white;
+}
+
+.seat.booked {
+    background-color: #dc3545 !important;
+    border-color: #dc3545 !important;
+    cursor: not-allowed !important;
+    opacity: 0.8 !important;
+}
+
+.seat.booked .seat-number,
+.seat.booked .seat-status {
+    color: white !important;
+}
+
+.seat.booked:hover {
+    transform: none !important;
+    box-shadow: 0 2px 4px rgba(0,0,0,0.1) !important;
+}
+
+.seat-legend {
+    display: flex;
+    justify-content: center;
+    gap: 20px;
+    margin-top: 20px;
+    padding: 15px;
+    background-color: #f8f9fa;
+    border-radius: 8px;
+}
+
+.seat-type .seat {
+    width: 35px;
+    height: 35px;
+    cursor: default;
+}
+
+.seat-type span {
+    font-size: 14px;
+    color: #495057;
+}
+
+#selectedSeatsDisplay {
+    padding: 10px;
+    margin: 10px 0;
+    border-radius: 4px;
+    font-size: 14px;
+    line-height: 1.4;
+}
+
+@media (max-width: 576px) {
+    .seat-map {
+        gap: 6px;
+        padding: 10px;
+    }
+
+    .seat {
+        width: 30px;
+        height: 30px;
+        font-size: 11px;
+    }
+}
+
+.selected-seat-item {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    background: white;
+    padding: 12px 15px;
+    border-radius: 8px;
+    border: 1px solid #e9ecef;
+    transition: all 0.2s ease;
+}
+
+.seat-number {
+    font-weight: 600;
+    color: #2c3e50;
+    font-size: 1rem;
+}
+
+/* Enhanced Seat Type Badge */
+.seat-type {
+    padding: 6px 12px;
+    border-radius: 20px;
+    font-size: 0.85rem;
+    font-weight: 500;
+    letter-spacing: 0.3px;
+    text-transform: uppercase;
+}
+
+.seat-type.vip {
+    background-color: #fef3c7;
+    color: #92400e;
+    border: 1px solid #fcd34d;
+}
+
+.seat-type.regular {
+    background-color: #e2e8f0;
+    color: #475569;
+    border: 1px solid #cbd5e1;
+}
+
+#selectedSeatsDisplay .text-muted {
+    padding: 10px;
+    text-align: center;
+    color: #6c757d;
+    font-style: italic;
+}
+
+/* Ticket Styles */
+.ticket-container {
+    border: 1px solid #ddd;
+    border-radius: 8px;
+    padding: 20px;
+    background-color: #fff;
+}
+
+.ticket-header {
+    border-bottom: 2px solid #f0f0f0;
+    margin-bottom: 15px;
+    padding-bottom: 15px;
+}
+
+.booking-ref {
+    color: #666;
+    font-size: 0.9em;
+}
+
+.ticket-details {
+    margin: 20px 0;
+}
+
+.ticket-footer {
+    border-top: 1px solid #f0f0f0;
+    margin-top: 15px;
+    padding-top: 15px;
+    font-size: 0.9em;
+}
+
+/* Payment Notice Styles */
+.payment-notice {
+    background-color: #e8f4f8;
+    border-left: 4px solid #17a2b8;
+    margin: 0;
+}
+
+.payment-notice i {
+    margin-right: 8px;
+    color: #17a2b8;
+}
+
+.payment-notice ul {
+    list-style-type: none;
+    padding-left: 25px;
+}
+
+.payment-notice ul li {
+    position: relative;
+    padding: 3px 0;
+}
+
+.payment-notice ul li:before {
+    content: "•";
+    position: absolute;
+    left: -15px;
+    color: #17a2b8;
+}
+.seat-type .price {
+    font-size: 0.9em;
+    color: #666;
+}
+
+.selected-seats-container {
+    background: #f8f9fa;
+    border-radius: 12px;
+    padding: 20px;
+    margin: 15px 0;
+    box-shadow: 0 2px 4px rgba(0,0,0,0.05);
+}
+
+.selected-seats-container h6 {
+    color: #495057;
+    margin-bottom: 15px;
+    font-weight: 600;
+    font-size: 1rem;
+}
+
+.selected-seats-list {
+    display: flex;
+    flex-direction: column;
+    gap: 10px;
+}
+
+.selected-seat-item:hover {
+    border-color: #dee2e6;
+    box-shadow: 0 2px 4px rgba(0,0,0,0.05);
+}
+
+
+/* Improved Remove Button */
+.remove-seat {
+    width: 32px;
+    height: 32px;
+    padding: 0;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    border-radius: 50% !important;
+    border: none !important;
+    background-color: #fee2e2 !important;
+    color: #dc2626 !important;
+    transition: all 0.2s ease;
+    cursor: pointer;
+    margin-left: 10px;
+}
+
+.remove-seat:hover {
+    background-color: #fecaca !important;
+    transform: scale(1.05);
+    color: #b91c1c !important;
+}
+
+.remove-seat i {
+    font-size: 16px;
+    line-height: 1;
+}
+
+/* No seats selected message */
+.text-muted {
+    text-align: center;
+    padding: 20px;
+    color: #6c757d;
+    font-style: italic;
+    background: white;
+    border-radius: 8px;
+    border: 1px dashed #dee2e6;
+}
+
+/* Form validation styles */
+.form-control.is-invalid {
+    border-color: #dc3545;
+    background-image: url("data:image/svg+xml,%3csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 12 12' width='12' height='12' fill='none' stroke='%23dc3545'%3e%3ccircle cx='6' cy='6' r='4.5'/%3e%3cpath stroke-linejoin='round' d='M5.8 3.6h.4L6 6.5z'/%3e%3ccircle cx='6' cy='8.2' r='.6' fill='%23dc3545' stroke='none'/%3e%3c/svg%3e");
+    background-repeat: no-repeat;
+    background-position: right calc(0.375em + 0.1875rem) center;
+    background-size: calc(0.75em + 0.375rem) calc(0.75em + 0.375rem);
+}
+
+.form-control.is-valid {
+    border-color: #198754;
+    background-image: url("data:image/svg+xml,%3csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 8 8'%3e%3cpath fill='%23198754' d='M2.3 6.73L.6 4.53c-.4-1.04.46-1.4 1.1-.8l1.1 1.4 3.4-3.8c.6-.63 1.6-.27 1.2.7l-4 4.6c-.43.5-.8.4-1.1.1z'/%3e%3c/svg%3e");
+    background-repeat: no-repeat;
+    background-position: right calc(0.375em + 0.1875rem) center;
+    background-size: calc(0.75em + 0.375rem) calc(0.75em + 0.375rem);
+}
+
+.invalid-feedback {
+    display: none;
+    color: #dc3545;
+    font-size: 0.875em;
+    margin-top: 0.25rem;
+}
+
+.form-control.is-invalid ~ .invalid-feedback {
+    display: block;
+} 

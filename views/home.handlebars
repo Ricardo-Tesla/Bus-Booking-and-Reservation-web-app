@@ -1,0 +1,52 @@
+<div class="container">
+    <h1>Available Routes</h1>
+    
+    <div class="row mb-3">
+        <div class="col-md-3">
+            <input type="text" id="searchInput" class="form-control" placeholder="Search routes...">
+        </div>
+        <div class="col-md-3">
+            <select id="timeFilter" class="form-select">
+                <option value="">All Times</option>
+                <option value="morning">Morning (6AM-12PM)</option>
+                <option value="afternoon">Afternoon (12PM-6PM)</option>
+                <option value="evening">Evening (After 6PM)</option>
+            </select>
+        </div>
+        <div class="col-md-3">
+            <select id="priceFilter" class="form-select">
+                <option value="">All Prices</option>
+                <option value="501-1000">KES 501-1000</option>
+                <option value="1001+">KES 1001+</option>
+            </select>
+        </div>
+    </div>
+
+    <div id="routesContainer" class="row">
+        {{#each routes}}
+        <div class="col-md-4 mb-4 route-card">
+            <div class="card">
+                <div class="card-body">
+                    <h5 class="card-title">{{from}} to {{to}}</h5>
+                    <p class="card-text">
+                        <strong>Regular Price:</strong> <span class="regular-price">{{seatLayout.prices.regular}}</span><br>
+                        <strong>VIP Price:</strong> KES {{seatLayout.prices.vip}}<br>
+                        <strong>Departure Times:</strong><br>
+                        {{#each schedule.monday}}
+                            <span class="badge bg-primary">{{this}}</span>
+                        {{/each}}
+                    </p>
+                    <a href="/route/{{id}}" class="btn btn-primary">View Details</a>
+                </div>
+            </div>
+        </div>
+        {{/each}}
+    </div>
+    
+    <div id="noResults" class="alert alert-info mt-3" style="display: none;">
+        <i class="fas fa-info-circle me-2"></i>
+        <span id="noResultsMessage">No routes found. Try adjusting your filters.</span>
+    </div>
+
+    <script src="/js/search.js"></script>
+</div> 

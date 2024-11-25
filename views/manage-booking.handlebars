@@ -1,0 +1,67 @@
+<div class="container my-4">
+    <h2>Manage Your Booking</h2>
+    
+    <div class="booking-actions mb-4">
+        <div class="row">
+            <div class="col-md-6">
+                <div class="card">
+                    <div class="card-body">
+                        <h5 class="card-title">View/Print Ticket</h5>
+                        <form id="viewTicketForm">
+                            <div class="mb-3">
+                                <label for="bookingRef" class="form-label">Booking Reference</label>
+                                <input type="text" class="form-control" id="bookingRef" required>
+                            </div>
+                            <div class="mb-3">
+                                <label for="phone" class="form-label">Phone Number</label>
+                                <input type="tel" class="form-control" id="phone" required>
+                            </div>
+                            <button type="submit" class="btn btn-primary">View Ticket</button>
+                        </form>
+                    </div>
+                </div>
+            </div>
+            
+            <div class="col-md-6">
+                <div class="card">
+                    <div class="card-body">
+                        <h5 class="card-title">Cancel Booking</h5>
+                        <p class="text-muted">
+                            Cancellations are free if made at least 2 hours before departure.
+                        </p>
+                        <form id="cancelBookingForm">
+                            <div class="mb-3">
+                                <label for="cancelBookingRef" class="form-label">Booking Reference</label>
+                                <input type="text" class="form-control" id="cancelBookingRef" required>
+                            </div>
+                            <div class="mb-3">
+                                <label for="cancelPhone" class="form-label">Phone Number</label>
+                                <input type="tel" class="form-control" id="cancelPhone" required>
+                            </div>
+                            <button type="submit" class="btn btn-danger">Cancel Booking</button>
+                        </form>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Ticket Display Modal -->
+    <div class="modal fade" id="ticketModal" tabindex="-1">
+        <div class="modal-dialog modal-lg">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <h5 class="modal-title">Your Ticket</h5>
+                    <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
+                </div>
+                <div class="modal-body" id="ticketContent">
+                    <!-- Ticket content will be inserted here -->
+                </div>
+                <div class="modal-footer">
+                    <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Close</button>
+                    <button type="button" class="btn btn-primary" id="printTicket">Print Ticket</button>
+                </div>
+            </div>
+        </div>
+    </div>
+</div> 
