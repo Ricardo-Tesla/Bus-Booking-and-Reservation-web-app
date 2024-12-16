@@ -2,12 +2,18 @@
 const utils = {
     // Show loading overlay
     showLoading: function() {
-        document.getElementById('loadingOverlay').style.display = 'flex';
+        const overlay = document.getElementById('loadingOverlay');
+        if (overlay) {
+            overlay.style.display = 'flex';
+        }
     },
 
     // Hide loading overlay
     hideLoading: function() {
-        document.getElementById('loadingOverlay').style.display = 'none';
+        const overlay = document.getElementById('loadingOverlay');
+        if (overlay) {
+            overlay.style.display = 'none';
+        }
     },
 
     // Show toast notification
@@ -15,27 +21,52 @@ const utils = {
         const toast = document.getElementById('notificationToast');
         const toastTitle = document.getElementById('toastTitle');
         const toastMessage = document.getElementById('toastMessage');
+        const progressBar = toast.querySelector('.toast-progress-bar');
         
+        if (!toast || !toastTitle || !toastMessage) {
+            console.warn('Toast elements not found');
+            return;
+        }
+        
+        // Remove existing classes
+        toast.className = 'toast';
+        
+        // Add type class
+        toast.classList.add(type);
+        
+        // Update content
         toastTitle.textContent = title;
         toastMessage.textContent = message;
         
-        // Remove existing classes
-        toast.classList.remove('bg-success', 'bg-danger', 'bg-info');
+        // Initialize Bootstrap toast
+        const bsToast = new bootstrap.Toast(toast, {
+            autohide: true,
+            delay: 5000
+        });
         
-        // Add appropriate class based on type
-        switch(type) {
-            case 'success':
-                toast.classList.add('bg-success', 'text-white');
-                break;
-            case 'error':
-                toast.classList.add('bg-danger', 'text-white');
-                break;
-            default:
-                toast.classList.add('bg-info', 'text-white');
+        // Reset and start progress bar
+        if (progressBar) {
+            progressBar.style.width = '100%';
+            progressBar.style.transition = 'width 5s linear';
+            setTimeout(() => {
+                progressBar.style.width = '0%';
+            }, 100);
         }
         
-        const bsToast = new bootstrap.Toast(toast);
+        // Show toast
         bsToast.show();
+        
+        // Add show class for animation
+        toast.classList.add('show');
+        
+        // Clean up
+        toast.addEventListener('hidden.bs.toast', () => {
+            toast.classList.remove('show');
+            if (progressBar) {
+                progressBar.style.width = '100%';
+                progressBar.style.transition = 'none';
+            }
+        });
     },
 
     // Form validation

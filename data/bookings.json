@@ -1,3 +1,124 @@
 {
-  "bookings": []
+  "bookings": [
+    {
+      "id": "BKM3YXM23TA6A",
+      "routeId": "19",
+      "travelDate": "2024-11-29",
+      "departureTime": "06:00",
+      "seats": [
+        {
+          "number": "11",
+          "type": "regular",
+          "isVIP": false
+        }
+      ],
+      "fullName": "RIcs",
+      "phone": "0788188292",
+      "email": "yeeue@ganaisl.com",
+      "bookingDate": "2024-11-26T20:51:03.594Z"
+    },
+    {
+      "id": "BKM3YXOXAN2ND",
+      "routeId": "8",
+      "travelDate": "2024-11-28",
+      "departureTime": "05:30",
+      "seats": [
+        {
+          "number": "11",
+          "type": "regular",
+          "isVIP": false
+        },
+        {
+          "number": "28",
+          "type": "regular",
+          "isVIP": false
+        },
+        {
+          "number": "31",
+          "type": "regular",
+          "isVIP": false
+        },
+        {
+          "number": "32",
+          "type": "regular",
+          "isVIP": false
+        }
+      ],
+      "fullName": "ricas",
+      "phone": "728292922",
+      "email": "ee@gma.cpm",
+      "bookingDate": "2024-11-26T20:53:17.327Z"
+    },
+    {
+      "id": "BKM3YXWNE66P3",
+      "routeId": "8",
+      "travelDate": "2024-11-28",
+      "departureTime": "05:30",
+      "seats": [
+        {
+          "number": "12",
+          "type": "regular",
+          "isVIP": false
+        }
+      ],
+      "fullName": "RIcs",
+      "phone": "0111111111",
+      "email": "rics@gan.com",
+      "bookingDate": "2024-11-26T20:59:17.742Z"
+    },
+    {
+      "id": "BKM3ZKARVG1JY",
+      "routeId": "1",
+      "travelDate": "2024-11-27",
+      "departureTime": "14:00",
+      "seats": [
+        {
+          "number": "2",
+          "type": "vip",
+          "isVIP": true
+        },
+        {
+          "number": "3",
+          "type": "vip",
+          "isVIP": true
+        },
+        {
+          "number": "10",
+          "type": "regular",
+          "isVIP": false
+        },
+        {
+          "number": "11",
+          "type": "regular",
+          "isVIP": false
+        },
+        {
+          "number": "16",
+          "type": "regular",
+          "isVIP": false
+        }
+      ],
+      "fullName": "Richard Ngabo",
+      "phone": "0742127157",
+      "email": "ngaborichard35@gmail.com",
+      "bookingDate": "2024-11-27T07:26:08.284Z"
+    },
+    {
+      "id": "BKM3ZSRMINUFP",
+      "routeId": "1",
+      "travelDate": "2024-11-27",
+      "departureTime": "22:00",
+      "seats": [
+        {
+          "number": "11",
+          "type": "regular",
+          "isVIP": false
+        }
+      ],
+      "fullName": "ris",
+      "phone": "0729929929",
+      "email": "yeyy@gma.com",
+      "bookingDate": "2024-11-27T11:23:11.424Z"
+    }
+  ]
 }

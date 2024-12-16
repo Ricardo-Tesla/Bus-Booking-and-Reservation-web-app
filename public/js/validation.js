@@ -20,6 +20,10 @@
 
             email: function(email) {
                 return email.trim().toLowerCase();
+            },
+
+            bookingReference: function(ref) {
+                return ref.trim().toUpperCase();
             }
         },
 
@@ -37,7 +41,7 @@
             },
 
             bookingReference: function(ref) {
-                return validation.patterns.bookingReference.test(ref);
+                return typeof ref === 'string' && /^BK[A-Z0-9]+$/.test(ref);
             },
 
             seats: function(seats, maxSeats) {
@@ -53,7 +57,7 @@
             email: "Please enter a valid email address",
             name: "Name should only contain letters and spaces (2-50 characters)",
             seats: "Please select at least one seat",
-            bookingReference: "Invalid booking reference format"
+            bookingReference: "Invalid booking reference. Should start with BK followed by letters and numbers"
         }
     };
 

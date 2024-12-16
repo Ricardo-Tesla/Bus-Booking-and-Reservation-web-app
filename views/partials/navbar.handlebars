@@ -1,0 +1,57 @@
+<nav class="navbar navbar-expand-lg navbar-dark bg-primary sticky-top">
+    <div class="container">
+        <a class="navbar-brand" href="/">
+            <img src="/images/file.png" alt="EASEBUS" class="logo">
+        </a>
+        
+        <div class="d-lg-none contact-info-mobile">
+            <a href="tel:+254719282835" class="btn btn-outline-light btn-sm">
+                <i class="fas fa-phone-alt me-1"></i>Call Us
+            </a>
+        </div>
+        
+        <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbarNav">
+            <span class="navbar-toggler-icon"></span>
+        </button>
+        
+        <div class="collapse navbar-collapse justify-content-between" id="navbarNav">
+            <ul class="navbar-nav mx-auto">
+                <li class="nav-item">
+                    <a class="nav-link {{#if (eq pageTitle undefined)}}active{{/if}}" href="/">
+                        <i class="fas fa-home me-1"></i>Home
+                    </a>
+                </li>
+                <li class="nav-item">
+                    <a class="nav-link {{#if (eq pageTitle 'About Us')}}active{{/if}}" href="/about">
+                        <i class="fas fa-info-circle me-1"></i>About us
+                    </a>
+                </li>
+                <li class="nav-item">
+                    <a class="nav-link {{#if (eq pageTitle 'Popular Routes')}}active{{/if}}" href="/routes">
+                        <i class="fas fa-route me-1"></i>Popular Routes
+                    </a>
+                </li>
+                <li class="nav-item">
+                    <a class="nav-link {{#if (eq pageTitle 'Contact Us')}}active{{/if}}" href="/contact">
+                        <i class="fas fa-envelope me-1"></i>Contact us
+                    </a>
+                </li>
+                <li class="nav-item">
+                    <a class="nav-link verify-ticket" href="/verify">
+                        <i class="fas fa-ticket-alt"></i>Verify Ticket
+                    </a>
+                </li>
+            </ul>
+            
+            <div class="contact-info d-none d-lg-block">
+                <div class="working-hours">
+                    <i class="far fa-clock me-1"></i>Mon-Sun 9am-5pm
+                </div>
+                <div class="call-center">
+                    <i class="fas fa-phone-alt me-1"></i>
+                    <a href="tel:+254719282835" class="text-white">+254 719 282 835</a>
+                </div>
+            </div>
+        </div>
+    </div>
+</nav> 

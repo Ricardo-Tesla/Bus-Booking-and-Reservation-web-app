@@ -1,65 +1,125 @@
-<div class="container my-4">
-    <div class="card">
-        <div class="card-body">
-            <div class="text-center mb-4">
-                <h2 class="text-success">
-                    <i class="fas fa-check-circle"></i> Booking Confirmed!
-                </h2>
-            </div>
+<div class="container my-5">
+    <div class="print-header" style="display: none;">
+        <div class="company-info text-center">
+            <h2>Easy Coach</h2>
+            <p>Bus Booking Confirmation</p>
+        </div>
+    </div>
 
-            <div class="booking-details">
-                <h4>Booking Details:</h4>
-                <div class="row">
-                    <div class="col-md-6">
-                        <p><strong>Booking ID:</strong> {{booking.id}}</p>
-                        <p><strong>Passenger Name:</strong> {{booking.fullName}}</p>
-                        <p><strong>Selected Seats:</strong> 
-                            {{#each booking.seats}}
-                                {{this.number}} ({{capitalize this.type}}){{#unless @last}}, {{/unless}}
-                            {{/each}}
-                        </p>
+    <div class="booking-confirmation-card">
+        <div class="success-header text-center mb-4">
+            <div class="check-circle">
+                <i class="fas fa-check-circle"></i>
+            </div>
+            <h2>Booking Confirmed!</h2>
+            <p class="text-muted">Your bus tickets have been successfully booked</p>
+        </div>
+
+        <div class="booking-details">
+            <div class="detail-section route-info">
+                <div class="section-header">
+                    <i class="fas fa-route"></i>
+                    <h5>Journey Details</h5>
+                </div>
+                <div class="route-content">
+                    <div class="route-cities">
+                        <span class="city">{{route.from}}</span>
+                        <i class="fas fa-arrow-right"></i>
+                        <span class="city">{{route.to}}</span>
                     </div>
-                    <div class="col-md-6">
-                        <p><strong>Travel Date:</strong> {{formatDate booking.travelDate}}</p>
-                        <p><strong>Departure Time:</strong> {{booking.departureTime}}</p>
-                        <p><strong>Route:</strong> {{route.from}} to {{route.to}}</p>
+                    <div class="journey-time">
+                        <div class="time-item">
+                            <i class="far fa-calendar"></i>
+                            <span>{{formatDate booking.travelDate}}</span>
+                        </div>
+                        <div class="time-item">
+                            <i class="far fa-clock"></i>
+                            <span>{{booking.departureTime}}</span>
+                        </div>
                     </div>
                 </div>
+            </div>
 
-                <div class="alert alert-info payment-notice mt-4">
-                    <h5><i class="fas fa-info-circle"></i> Payment Instructions:</h5>
-                    <ul class="mb-0">
-                        <li>Total Amount: <strong>KES {{totalAmount}}</strong></li>
-                        <li>Payment to be made in cash when boarding the bus</li>
-                        <li>Please arrive 30 minutes before departure time</li>
-                        <li>Keep this booking reference for verification: <strong>{{booking.id}}</strong></li>
+            <div class="detail-section passenger-info">
+                <div class="section-header">
+                    <i class="fas fa-user"></i>
+                    <h5>Passenger Information</h5>
+                </div>
+                <div class="row">
+                    <div class="col-md-6">
+                        <div class="info-item">
+                            <label>Booking Reference:</label>
+                            <span class="booking-id">{{booking.id}}</span>
+                        </div>
+                        <div class="info-item">
+                            <label>Passenger Name:</label>
+                            <span>{{booking.fullName}}</span>
+                        </div>
+                    </div>
+                    <div class="col-md-6">
+                        <div class="info-item">
+                            <label>Selected Seats:</label>
+                            <div class="seats-list">
+                                {{#each booking.seats}}
+                                    <span class="seat-badge {{toLowerCase this.type}}">
+                                        {{this.number}}
+                                        <small>({{capitalize this.type}})</small>
+                                    </span>
+                                {{/each}}
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <div class="detail-section payment-info">
+                <div class="section-header">
+                    <i class="fas fa-info-circle"></i>
+                    <h5>Payment & Boarding Instructions</h5>
+                </div>
+                <div class="payment-content">
+                    <div class="amount-display">
+                        <span>Total Amount:</span>
+                        <span class="amount">{{formatCurrency totalAmount}}</span>
+                    </div>
+                    <ul class="instructions-list">
+                        <li><i class="fas fa-money-bill"></i> Payment to be made in cash when boarding the bus</li>
+                        <li><i class="fas fa-clock"></i> Please arrive 30 minutes before departure time</li>
+                        <li><i class="fas fa-ticket-alt"></i> Keep your booking reference for verification</li>
                     </ul>
                 </div>
             </div>
+        </div>
 
-            <div class="text-center mt-4">
-                <a href="/" class="btn btn-primary">Back to Home</a>
-                <button onclick="window.print()" class="btn btn-secondary ms-2">
-                    <i class="fas fa-print"></i> Print Ticket
-                </button>
-            </div>
+        <div class="actions-footer text-center mt-4">
+            <a href="/routes" class="btn btn-secondary">
+                <i class="fas fa-arrow-left me-2"></i>Back to Routes
+            </a>
+            <button onclick="window.print()" class="btn btn-primary ms-3">
+                <i class="fas fa-print me-2"></i>Print Ticket
+            </button>
         </div>
     </div>
 </div>
 
-<style>
-    @media print {
-        .btn { display: none; }
+<div class="print-footer" style="display: none;">
+    <p>Printed on: {{formatDate (now)}} | Booking Reference: {{booking.id}}</p>
+    <p>This is an official booking confirmation from Easy Coach</p>
+    <p>For any queries, please contact us at support@easycoach.com</p>
+</div>
+
+<div class="booking-qr" style="display: none;">
+    <img src="https://api.qrserver.com/v1/create-qr-code/?size=150x150&data={{booking.id}}" 
+         alt="Booking QR Code">
+    <p>Scan to verify booking</p>
+</div>
+
+<script>
+    function printTicket() {
+        // Add any specific print preparation if needed
+        window.print();
     }
-    .payment-notice {
-        background-color: #e8f4f8;
-        border-left: 4px solid #17a2b8;
-    }
-    .payment-notice ul {
-        list-style-type: none;
-        padding-left: 25px;
-    }
-    .booking-details p {
-        margin-bottom: 0.5rem;
-    }
-</style> 
+
+    // Update the print button click handler
+    document.querySelector('[onclick="window.print()"]').onclick = printTicket;
+</script> 

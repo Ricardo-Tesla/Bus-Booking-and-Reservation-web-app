@@ -1,7 +1,6 @@
-<div class="booking-form mt-4" id="bookingForm" style="display: none;">
+<div class="booking-form mt-4" id="bookingForm">
     <div class="card">
         <div class="card-body">
-            <h5>Booking Information</h5>
             <form id="reservationForm" class="needs-validation" novalidate>
                 <input type="hidden" name="routeId" value="{{route.id}}">
                 <input type="hidden" id="selectedSeatsInput" name="selectedSeats" required>
@@ -13,6 +12,9 @@
                            required 
                            pattern="[A-Za-z\s]{2,50}"
                            placeholder="Enter your full name">
+                    <div class="invalid-feedback">
+                        {{validation.errors.name}}
+                    </div>
                 </div>
                 <div class="mb-3">
                     <label class="form-label">Phone Number</label>
@@ -20,8 +22,11 @@
                            class="form-control" 
                            name="phone" 
                            required 
-                           pattern="^(?:254|\+254|0)?[71]\d{8}$"
+                           pattern="(?:254|\+254|0)?[71]\d{8}"
                            placeholder="e.g., 0712345678">
+                    <div class="invalid-feedback">
+                        {{validation.errors.phone}}
+                    </div>
                 </div>
                 <div class="mb-3">
                     <label class="form-label">Email</label>
@@ -29,10 +34,15 @@
                            class="form-control" 
                            name="email" 
                            required 
-                           pattern="[a-zA-Z0-9._-]+@[a-zA-Z0-9.-]+\.[a-zA-Z]{2,}"
                            placeholder="your.email@example.com">
+                    <div class="invalid-feedback">
+                        {{validation.errors.email}}
+                    </div>
                 </div>
-                <button type="submit" class="btn btn-primary">Complete Booking</button>
+                <div class="d-flex justify-content-between">
+                    <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Back</button>
+                    <button type="submit" class="btn btn-primary">Complete Booking</button>
+                </div>
             </form>
         </div>
     </div>

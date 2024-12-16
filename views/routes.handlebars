@@ -1,0 +1,127 @@
+<div class="routes-hero">
+    <div class="hero-overlay"></div>
+    <div class="container">
+        <div class="hero-content text-center">
+            <h1 class="display-4 fw-bold">Popular Routes</h1>
+            <p class="lead">Find Your Perfect Journey</p>
+        </div>
+    </div>
+</div>
+
+<div class="container routes-container py-5">
+    <!-- Search and Filters Section -->
+    <div class="search-section" data-aos="fade-up">
+        <div class="card shadow-sm">
+            <div class="card-body">
+                <div class="row g-3">
+                    <div class="col-md-4">
+                        <div class="search-input-group">
+                            <i class="fas fa-search"></i>
+                            <input type="text" 
+                                   id="searchInput" 
+                                   class="form-control" 
+                                   placeholder="Search routes...">
+                        </div>
+                    </div>
+                    <div class="col-md-4">
+                        <div class="search-input-group">
+                            <i class="far fa-clock"></i>
+                            <select id="timeFilter" class="form-select">
+                                <option value="">All Times</option>
+                                <option value="morning">Morning (6AM - 12PM)</option>
+                                <option value="afternoon">Afternoon (12PM - 6PM)</option>
+                                <option value="evening">Evening (After 6PM)</option>
+                            </select>
+                        </div>
+                    </div>
+                    <div class="col-md-4">
+                        <div class="search-input-group">
+                            <i class="fas fa-tag"></i>
+                            <select id="priceFilter" class="form-select">
+                                <option value="">All Prices</option>
+                                <option value="0-500">Under KES 500</option>
+                                <option value="501-1000">KES 501 - 1000</option>
+                                <option value="1001+">Above KES 1000</option>
+                            </select>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Routes List -->
+    <div class="routes-grid mt-4">
+        <div class="row g-4" id="routesList">
+            {{#each routes}}
+            <div class="col-md-6 col-lg-4 route-card" data-aos="fade-up">
+                <div class="card h-100 route-card-inner">
+                    <div class="card-body">
+                        <div class="route-header">
+                            <h5 class="card-title">
+                                <i class="fas fa-map-marker-alt text-danger"></i>
+                                {{from}} 
+                                <i class="fas fa-arrow-right mx-2"></i>
+                                <i class="fas fa-map-marker-alt text-success"></i>
+                                {{to}}
+                            </h5>
+                        </div>
+                        
+                        <div class="route-info">
+                            <div class="info-item">
+                                <i class="fas fa-road"></i>
+                                <span>{{distance}} km</span>
+                            </div>
+                            <div class="info-item">
+                                <i class="fas fa-clock"></i>
+                                <span>{{duration}}</span>
+                            </div>
+                        </div>
+
+                        <div class="price-info">
+                            <div class="regular-price">
+                                <span class="price-label">From</span>
+                                <span class="price-amount">KES {{seatLayout.prices.regular}}</span>
+                            </div>
+                            {{#if seatLayout.vipRows}}
+                            <div class="vip-price">
+                                <span class="price-label">VIP</span>
+                                <span class="price-amount">KES {{seatLayout.prices.vip}}</span>
+                            </div>
+                            {{/if}}
+                        </div>
+
+                        <div class="departure-times">
+                            <h6><i class="far fa-clock me-2"></i>Departure Times</h6>
+                            <div class="time-badges">
+                                {{#each (lookup schedule 'monday')}}
+                                <span class="badge bg-light text-dark">{{this}}</span>
+                                {{/each}}
+                            </div>
+                        </div>
+                    </div>
+                    <div class="card-footer">
+    <a href="/route/{{id}}" class="btn btn-primary w-100">
+        <i class="fas fa-ticket-alt me-2"></i>Book Now
+    </a>
+</div>
+                </div>
+            </div>
+            {{/each}}
+        </div>
+
+        <!-- No Results Message -->
+        <div id="noResults" class="text-center py-5" style="display: none;">
+            <div class="no-results-content">
+                <i class="fas fa-search fa-3x text-muted mb-3"></i>
+                <h3>No Routes Found</h3>
+                <p class="text-muted">Try adjusting your search criteria</p>
+                <button class="btn btn-outline-primary mt-3" onclick="resetFilters()">
+                    <i class="fas fa-redo me-2"></i>Reset Filters
+                </button>
+            </div>
+        </div>
+    </div>
+</div>
+
+<script src="/js/search.js"></script>

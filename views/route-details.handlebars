@@ -1,108 +1,160 @@
-<div class="container">
-    <div class="row">
-        <!-- Route Details -->
-        <div class="col-md-4">
-            <div class="card mb-4">
-                <div class="card-body">
-                    <h5 class="card-title">{{route.from}} to {{route.to}}</h5>
-                    <p>Distance: {{route.distance}} km</p>
-                    <p>Duration: {{route.duration}}</p>
-                </div>
-            </div>
+<div class="container my-5">
+    <!-- Booking Progress Stepper -->
+    <div class="booking-stepper mb-4">
+        <div class="step active" id="stepSeats">
+            <div class="step-icon">1</div>
+            <div class="step-label">Select Seats</div>
+        </div>
+        <div class="step" id="stepDetails">
+            <div class="step-icon">2</div>
+            <div class="step-label">Passenger Details</div>
+        </div>
+        <div class="step" id="stepConfirm">
+            <div class="step-icon">3</div>
+            <div class="step-label">Confirm Booking</div>
+        </div>
+    </div>
 
-            <!-- Date and Time Selection -->
-            <div class="card mb-4">
-                <div class="card-body">
-                    <h5 class="card-title">Select Travel Date & Time</h5>
+    <!-- Route Information -->
+    <div class="card mb-4">
+        <div class="card-body">
+            <h4 class="card-title">
+                <i class="fas fa-route me-2"></i>
+                {{routeData.from}} → {{routeData.to}}
+            </h4>
+            <div class="row">
+                <div class="col-md-6">
                     <div class="mb-3">
                         <label class="form-label">Travel Date</label>
-                        <input type="date" class="form-control" id="travelDate" required>
+                        <input type="date" class="form-control" id="travelDate">
                     </div>
+                </div>
+                <div class="col-md-6">
                     <div class="mb-3">
                         <label class="form-label">Departure Time</label>
-                        <select class="form-control" id="departureTime" required>
-                            <option value="">Select a date first</option>
+                        <select class="form-select" id="departureTime">
+                            {{#each routeData.departureTimes}}
+                                <option value="{{this}}">{{this}}</option>
+                            {{/each}}
                         </select>
-                    </div>
-                </div>
-            </div>
-
-            <!-- Price Calculator -->
-            <div class="card mb-4">
-                <div class="card-body">
-                    <h5 class="card-title">Price Calculator</h5>
-                    <div id="priceBreakdown">
-                        <p>Selected VIP Seats: <span id="vipCount">0</span> (KES <span id="vipTotal">0</span>)</p>
-                        <p>Selected Regular Seats: <span id="regularCount">0</span> (KES <span id="regularTotal">0</span>)</p>
-                        <h6>Total: KES <span id="totalPrice">0</span></h6>
-                    </div>
-                </div>
-            </div>
-
-            <!-- Payment Notice -->
-            <div class="card mb-4">
-                <div class="card-body">
-                    <div class="alert alert-info payment-notice mb-0">
-                        <i class="fas fa-info-circle"></i>
-                        <strong>Payment Information:</strong>
-                        <ul class="mb-0 mt-2">
-                            <li>Payment is in cash only, collected when boarding the bus</li>
-                            <li>Please arrive 30 minutes before departure</li>
-                            <li>Your seat reservation is held for 30 minutes before departure</li>
-                        </ul>
-                    </div>
-                </div>
-            </div>
-        </div>
-
-        <!-- Seat Map -->
-        <div class="col-md-8">
-            <div class="card mb-4">
-                <div class="card-body">
-                    <h5 class="card-title">Select Seats</h5>
-                    <div class="seat-map" id="seatMap"></div>
-                    <div id="selectedSeatsDisplay" class="mt-3"></div>
-                    <div class="seat-legend mt-3">
-                        <div class="seat-type">
-                            <div class="seat regular">
-                                <span class="seat-number">R</span>
-                            </div>
-                            <span>Regular</span>
-                        </div>
-                        <div class="seat-type">
-                            <div class="seat vip">
-                                <span class="seat-number">V</span>
-                            </div>
-                            <span>VIP</span>
-                        </div>
-                        <div class="seat-type">
-                            <div class="seat booked">
-                                <span class="seat-number">B</span>
-                            </div>
-                            <span>Booked</span>
-                        </div>
-                        <div class="seat-type">
-                            <div class="seat selected">
-                                <span class="seat-number">S</span>
-                            </div>
-                            <span>Selected</span>
-                        </div>
                     </div>
                 </div>
             </div>
         </div>
     </div>
 
-    <!-- Booking Form -->
-    {{> booking-form}}
+    <!-- Seat Selection Area -->
+    <div class="row">
+        <div class="col-md-8">
+            <div class="card mb-4">
+                <div class="card-body">
+                    <h5 class="card-title">Select Your Seats</h5>
+                    <div id="seatMap" class="seat-map"></div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Selected Seats and Price Summary -->
+        <div class="col-md-4">
+            <div class="card mb-3">
+                <div class="card-body">
+                    <h5 class="card-title">
+                        <i class="fas fa-ticket-alt me-2"></i>Selected Seats
+                    </h5>
+                    <div id="selectedSeatsDisplay" class="selected-seats-display">
+                        {{#if selectedSeats}}
+                            <div class="selected-seats-grid">
+                                {{#each selectedSeats}}
+                                    <div class="selected-seat-item {{type}}">
+                                        <div class="seat-number">
+                                            <i class="fas fa-chair"></i>
+                                            <span>{{number}}</span>
+                                        </div>
+                                        <div class="seat-details">
+                                            <span class="seat-type-badge">{{type}}</span>
+                                            <span class="seat-position">{{position}}</span>
+                                        </div>
+                                    </div>
+                                {{/each}}
+                            </div>
+                        {{else}}
+                            <div class="empty-seats-message">
+                                <i class="fas fa-info-circle"></i>
+                                <div class="message-content">
+                                    <p>No seats selected</p>
+                                    <small>Click on available seats to select them</small>
+                                </div>
+                            </div>
+                        {{/if}}
+                    </div>
+                </div>
+            </div>
+
+            <div class="card">
+                <div class="card-body">
+                    <h5 class="card-title">Price Breakdown</h5>
+                    <div class="price-breakdown">
+                        <div class="breakdown-item">
+                            <span>VIP Seats <span class="seat-count" id="vipCount">0</span></span>
+                            <span>KES <span id="vipTotal">0</span></span>
+                        </div>
+                        <div class="breakdown-item">
+                            <span>Regular Seats <span class="seat-count" id="regularCount">0</span></span>
+                            <span>KES <span id="regularTotal">0</span></span>
+                        </div>
+                        <div class="breakdown-item total">
+                            <span>Total Amount</span>
+                            <span>KES <span id="totalPrice">0</span></span>
+                        </div>
+                    </div>
+                    <button id="continueToDetails" 
+                            class="btn btn-primary w-100 mt-3" 
+                            disabled>
+                        <i class="fas fa-arrow-right me-2"></i>Continue to Passenger Details
+                    </button>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- Passenger Details Modal -->
+<div class="modal fade" id="passengerDetailsModal" tabindex="-1">
+    <div class="modal-dialog">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h5 class="modal-title">Passenger Details</h5>
+                <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
+            </div>
+            <div class="modal-body">
+                {{> booking-form}}
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- Booking Confirmation Modal -->
+<div class="modal fade" id="bookingConfirmationModal" tabindex="-1">
+    <div class="modal-dialog">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h5 class="modal-title">Confirm Booking</h5>
+                <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
+            </div>
+            <div class="modal-body">
+                <!-- Content will be dynamically inserted -->
+            </div>
+            <div class="modal-footer">
+                <button type="button" class="btn btn-secondary" id="backToDetails">Back</button>
+                <button type="button" class="btn btn-primary" id="confirmBooking">Confirm Booking</button>
+            </div>
+        </div>
+    </div>
 </div>
 
 <script>
-    const routeData = {
-        ...{{{routeJSON}}},
-        rules: {
-            maxSeatsPerBooking: {{businessRules.maxSeatsPerBooking}},
-            minBookingHours: {{businessRules.minBookingHours}}
-        }
-    };
-</script> 
+    const routeData = {{{json route}}};
+    console.log('Route data loaded:', routeData);
+    console.log('Seat Layout:', routeData.seatLayout);
+    console.log('Prices:', routeData.seatLayout.prices);
+</script>

@@ -1,40 +1,279 @@
-<div class="container">
+<div class="container my-5">
     <div class="row justify-content-center">
-        <div class="col-md-6">
-            <div class="card">
-                <div class="card-body">
-                    <h5 class="card-title">Verify Booking</h5>
-                    <form id="verifyForm">
-                        <div class="mb-3">
-                            <label class="form-label">Booking Reference</label>
-                            <input type="text" 
-                                   class="form-control" 
-                                   id="bookingReference" 
-                                   placeholder="e.g., BK1234567890"
-                                   required
-                                   pattern="BK[A-Z0-9]{10}">
-                            <div class="form-text">Enter your booking reference number</div>
+        <div class="col-md-8">
+            <div class="verify-booking-card">
+                <div class="card">
+                    <div class="card-header bg-primary text-white">
+                        <h4 class="mb-0">
+                            <i class="fas fa-ticket-alt me-2"></i>Verify Ticket
+                        </h4>
+                    </div>
+                    <div class="card-body">
+                        <div class="verification-info alert alert-info mb-4">
+                            <i class="fas fa-info-circle me-2"></i>
+                            <div>
+                                <strong>About Ticket Verification:</strong>
+                                <p class="mb-0">Since we don't require accounts, you can verify any ticket using:</p>
+                                <ul class="mb-0">
+                                    <li>Booking Reference (starts with 'BK')</li>
+                                    <li>Phone number used during booking</li>
+                                </ul>
+                            </div>
                         </div>
-                        <div class="mb-3">
-                            <label class="form-label">Phone Number</label>
-                            <input type="tel" 
-                                   class="form-control" 
-                                   id="phoneNumber"
-                                   placeholder="Phone number used for booking"
-                                   required>
-                        </div>
-                        <button type="submit" class="btn btn-primary">Verify Booking</button>
-                    </form>
-                </div>
-            </div>
 
-            <!-- Booking Details (initially hidden) -->
-            <div id="bookingDetails" class="card mt-4" style="display: none;">
-                <div class="card-body">
-                    <h5 class="card-title">Booking Details</h5>
-                    <div id="bookingInfo"></div>
+                        <form id="verifyForm" class="needs-validation" novalidate>
+                            <div class="mb-4">
+                                <label class="form-label">Booking Reference</label>
+                                <div class="input-group">
+                                    <span class="input-group-text">
+                                        <i class="fas fa-bookmark"></i>
+                                    </span>
+                                    <input type="text" 
+                                           class="form-control" 
+                                           id="bookingReference" 
+                                           placeholder="e.g., BK1234ABC"
+                                           required
+                                           pattern="BK[A-Z0-9]+"
+                                           autocomplete="off">
+                                </div>
+                                <div class="form-text">Enter the booking reference from your ticket</div>
+                                <div class="invalid-feedback">Please enter a valid booking reference</div>
+                            </div>
+
+                            <div class="mb-4">
+                                <label class="form-label">Phone Number</label>
+                                <div class="input-group">
+                                    <span class="input-group-text">
+                                        <i class="fas fa-phone"></i>
+                                    </span>
+                                    <input type="tel" 
+                                           class="form-control" 
+                                           id="phoneNumber"
+                                           placeholder="e.g., 0712345678"
+                                           required
+                                           pattern="^(?:254|\+254|0)?[71]\d{8}$">
+                                </div>
+                                <div class="form-text">Enter the phone number used during booking</div>
+                                <div class="invalid-feedback">Please enter a valid phone number</div>
+                            </div>
+
+                            <button type="submit" class="btn btn-primary w-100">
+                                <i class="fas fa-search me-2"></i>Verify Ticket
+                            </button>
+                        </form>
+                    </div>
+                </div>
+
+                <!-- Booking Details Card (initially hidden) -->
+                <div id="bookingDetails" class="booking-details-card mt-4" style="display: none;">
+                    <div class="verified-ticket-header">
+                        <h5 class="mb-0">
+                            <i class="fas fa-check-circle"></i>
+                            Verified Ticket Details
+                        </h5>
+                    </div>
+                    <div class="card-body">
+                        <div id="bookingInfo"></div>
+                    </div>
                 </div>
             </div>
         </div>
     </div>
-</div> 
+</div>
+
+<style>
+.verify-booking-card {
+    max-width: 800px;
+    margin: 0 auto;
+}
+
+.verification-info ul {
+    list-style-type: none;
+    padding-left: 1.5rem;
+    margin-top: 0.5rem;
+}
+
+.verification-info ul li:before {
+    content: "•";
+    color: #0d6efd;
+    font-weight: bold;
+    display: inline-block;
+    width: 1em;
+    margin-left: -1em;
+}
+
+.booking-details-grid {
+    display: grid;
+    gap: 1rem;
+    grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
+}
+
+.detail-item {
+    padding: 1rem;
+    border: 1px solid #dee2e6;
+    border-radius: 0.5rem;
+    background: #f8f9fa;
+}
+
+.detail-item i {
+    color: #0d6efd;
+    margin-right: 0.5rem;
+    width: 20px;
+}
+
+.seats-container {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 0.5rem;
+    margin-top: 0.5rem;
+}
+
+.seat-badge {
+    display: inline-flex;
+    flex-direction: column;
+    align-items: center;
+    padding: 0.5rem;
+    border-radius: 0.5rem;
+    font-weight: 500;
+    min-width: 3.5rem;
+    text-align: center;
+    background: #f8f9fa;
+    border: 1px solid #dee2e6;
+}
+
+.seat-badge.vip {
+    background: #fff3cd;
+    border-color: #ffeeba;
+    color: #856404;
+}
+
+.seat-badge.regular {
+    background: #e2e3e5;
+    border-color: #d6d8db;
+    color: #383d41;
+}
+
+.seat-badge small {
+    font-size: 0.75em;
+    opacity: 0.8;
+    text-transform: uppercase;
+    margin-top: 0.2rem;
+}
+
+.seats-detail {
+    grid-column: 1 / -1;
+}
+
+.detail-item {
+    transition: all 0.3s ease;
+}
+
+.detail-item:hover {
+    transform: translateY(-2px);
+    box-shadow: 0 4px 6px rgba(0,0,0,0.1);
+}
+
+/* Helper function for currency formatting */
+function formatCurrency(amount) {
+    return `KES ${amount.toLocaleString()}`;
+}
+</style>
+
+<script>
+document.addEventListener('DOMContentLoaded', function() {
+    const verifyForm = document.getElementById('verifyForm');
+    const bookingDetails = document.getElementById('bookingDetails');
+    const bookingInfo = document.getElementById('bookingInfo');
+
+    // Add the formatCurrency function inside the scope
+    function formatCurrency(amount) {
+        return `KES ${amount.toLocaleString()}`;
+    }
+
+    function formatSeats(seats) {
+        return `
+            <div class="seats-container">
+                ${seats.map(seat => `
+                    <span class="seat-badge ${seat.type.toLowerCase()}">
+                        ${seat.number}
+                        <small>${seat.type}</small>
+                    </span>
+                `).join('')}
+            </div>
+        `;
+    }
+
+    verifyForm?.addEventListener('submit', async function(e) {
+        e.preventDefault();
+        
+        if (!this.checkValidity()) {
+            e.stopPropagation();
+            this.classList.add('was-validated');
+            return;
+        }
+
+        const bookingReference = document.getElementById('bookingReference').value;
+        const phoneNumber = document.getElementById('phoneNumber').value;
+
+        try {
+            const response = await fetch('/api/verify-booking', {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json'
+                },
+                body: JSON.stringify({ 
+                    bookingReference: bookingReference.trim(),
+                    phone: phoneNumber.trim()
+                })
+            });
+
+            const data = await response.json();
+
+            if (!response.ok) {
+                throw new Error(data.error || 'Verification failed');
+            }
+
+            // Update the booking details display
+            bookingInfo.innerHTML = `
+                <div class="booking-details-grid">
+                    <div class="detail-item">
+                        <h6><i class="fas fa-route"></i>Route</h6>
+                        <p class="mb-0">${data.booking.route.from} → ${data.booking.route.to}</p>
+                    </div>
+                    <div class="detail-item">
+                        <h6><i class="fas fa-calendar"></i>Travel Date</h6>
+                        <p class="mb-0">${new Date(data.booking.travelDate).toLocaleDateString()}</p>
+                    </div>
+                    <div class="detail-item">
+                        <h6><i class="fas fa-clock"></i>Departure Time</h6>
+                        <p class="mb-0">${data.booking.departureTime}</p>
+                    </div>
+                    <div class="detail-item">
+                        <h6><i class="fas fa-user"></i>Passenger</h6>
+                        <p class="mb-0">${data.booking.passengerName}</p>
+                    </div>
+                    <div class="detail-item seats-detail">
+                        <h6><i class="fas fa-chair"></i>Selected Seats</h6>
+                        ${formatSeats(data.booking.seats)}
+                    </div>
+                    <div class="detail-item">
+                        <h6><i class="fas fa-money-bill"></i>Total Amount</h6>
+                        <p class="mb-0">${formatCurrency(data.booking.totalAmount)}</p>
+                    </div>
+                    <div class="detail-item">
+                        <h6><i class="fas fa-calendar-check"></i>Booking Date</h6>
+                        <p class="mb-0">${new Date(data.booking.bookingDate).toLocaleDateString()}</p>
+                    </div>
+                </div>
+            `;
+
+            bookingDetails.style.display = 'block';
+            utils.showToast('Success', 'Ticket verified successfully!', 'success');
+            
+        } catch (error) {
+            utils.showToast('Error', error.message, 'error');
+            bookingDetails.style.display = 'none';
+        }
+    });
+});
+</script> 

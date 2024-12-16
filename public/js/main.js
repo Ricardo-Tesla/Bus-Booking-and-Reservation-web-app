@@ -1,546 +1,945 @@
-// Store DOM references
+// Single declaration of elements at the top level
 const elements = {
-  seatMap: document.getElementById("seatMap"),
-  bookingForm: document.getElementById("bookingForm"),
-  selectedSeatsDisplay: document.getElementById("selectedSeatsDisplay"),
-  selectedSeatsInput: document.getElementById("selectedSeatsInput"),
-  departureTimeSelect: document.getElementById("departureTime"),
-  travelDateInput: document.getElementById("travelDate"),
-  totalAmountInput: document.getElementById("totalAmountInput"),
-  priceBreakdown: {
-    vipCount: document.getElementById("vipCount"),
-    regularCount: document.getElementById("regularCount"),
-    vipTotal: document.getElementById("vipTotal"),
-    regularTotal: document.getElementById("regularTotal"),
-    totalPrice: document.getElementById("totalPrice"),
-  },
+  travelDateInput: null,
+  departureTimeSelect: null,
+  seatMap: null,
+  selectedSeatsDisplay: null,
+  totalAmountDisplay: null,
+  vipCountDisplay: null,
+  vipTotalDisplay: null,
+  regularCountDisplay: null,
+  regularTotalDisplay: null,
+  totalPriceDisplay: null,
+  passengerDetailsModal: null,
+  bookingConfirmationModal: null,
+  continueButton: null,
+  confirmDetailsButton: null,
+  backToDetailsButton: null,
+  passengerForm: null,
+  confirmBookingButton: null,
 };
 
-// Initialize the application
-document.addEventListener("DOMContentLoaded", function () {
-  if (elements.seatMap) {
-    // Wait for a brief moment to ensure all data is loaded
-    setTimeout(() => {
-      createSeatMap();
-      updateSeatAvailability();
-    }, 100);
+// Initialize all elements
+function initializeElements() {
+  elements.travelDateInput = document.getElementById("travelDate");
+  elements.departureTimeSelect = document.getElementById("departureTime");
+  elements.seatMap = document.getElementById("seatMap");
+  elements.selectedSeatsDisplay = document.getElementById(
+    "selectedSeatsDisplay"
+  );
+  elements.vipCountDisplay = document.getElementById("vipCount");
+  elements.vipTotalDisplay = document.getElementById("vipTotal");
+  elements.regularCountDisplay = document.getElementById("regularCount");
+  elements.regularTotalDisplay = document.getElementById("regularTotal");
+  elements.totalPriceDisplay = document.getElementById("totalPrice");
+  elements.continueButton = document.getElementById("continueToDetails");
+  elements.confirmDetailsButton = document.getElementById("confirmDetails");
+  elements.backToDetailsButton = document.getElementById("backToDetails");
+  elements.passengerForm = document.getElementById("passengerDetailsForm");
+  elements.confirmBookingButton = document.getElementById("confirmBooking");
 
-    dateTimeHandler.init();
-    setupFormValidation();
+  // Safely initialize modals
+  const passengerDetailsModalEl = document.getElementById(
+    "passengerDetailsModal"
+  );
+  const bookingConfirmationModalEl = document.getElementById(
+    "bookingConfirmationModal"
+  );
+
+  if (typeof bootstrap !== "undefined" && bootstrap.Modal) {
+    if (passengerDetailsModalEl) {
+      elements.passengerDetailsModal = new bootstrap.Modal(
+        passengerDetailsModalEl,
+        {
+          backdrop: "static",
+          keyboard: false,
+        }
+      );
+    }
+
+    if (bookingConfirmationModalEl) {
+      elements.bookingConfirmationModal = new bootstrap.Modal(
+        bookingConfirmationModalEl,
+        {
+          backdrop: "static",
+          keyboard: false,
+        }
+      );
+    }
+  }
+
+  console.log("Elements initialized:", {
+    seatMap: !!elements.seatMap,
+    travelDate: !!elements.travelDateInput,
+    departureTime: !!elements.departureTimeSelect,
+    priceDisplays: {
+      vipCount: !!elements.vipCountDisplay,
+      vipTotal: !!elements.vipTotalDisplay,
+      regularCount: !!elements.regularCountDisplay,
+      regularTotal: !!elements.regularTotalDisplay,
+      totalPrice: !!elements.totalPriceDisplay,
+    },
+    modals: {
+      passengerDetails: !!elements.passengerDetailsModal,
+      bookingConfirmation: !!elements.bookingConfirmationModal,
+    },
+  });
+
+  // Setup form handlers
+  setupFormHandlers();
+}
+
+// Main initialization on DOM load
+document.addEventListener("DOMContentLoaded", function () {
+  console.log("DOM loaded, initializing...");
+  initializeElements();
+
+  // Only proceed with seat map initialization if it exists
+  if (document.getElementById("seatMap")) {
+    console.log("Seat map element found");
     setupEventListeners();
+    setDefaultDate();
   }
 });
 
-// Setup event listeners
+// Event Listeners Setup
 function setupEventListeners() {
-  // Date and time change handlers
-  elements.travelDateInput?.addEventListener("change", updateSeatAvailability);
-  elements.departureTimeSelect?.addEventListener(
-    "change",
-    updateSeatAvailability
+  // Date change handler
+  elements.travelDateInput?.addEventListener("change", () => {
+    console.log("Date changed:", elements.travelDateInput.value);
+    checkAndUpdateAvailableTimes();
+  });
+
+  // Time change handler
+  elements.departureTimeSelect?.addEventListener("change", () => {
+    console.log("Time changed:", elements.departureTimeSelect.value);
+    updateSeatAvailability();
+  });
+
+  // Button handlers
+  elements.continueButton?.addEventListener("click", handleContinueToDetails);
+  elements.confirmDetailsButton?.addEventListener(
+    "click",
+    handleConfirmDetails
+  );
+  elements.backToDetailsButton?.addEventListener("click", handleBackToDetails);
+  elements.confirmBookingButton?.addEventListener(
+    "click",
+    handleConfirmBooking
   );
 
-  // Return journey handler
-  document
-    .getElementById("returnJourney")
-    ?.addEventListener("change", handleReturnJourney);
-}
-
-// Helper function to determine seat position
-function getSeatPosition(seatInRow, seatsPerRow) {
-  if (seatInRow === 1 || seatInRow === seatsPerRow) {
-    return "Window";
+  // Modal handlers
+  if (elements.passengerDetailsModal?._element) {
+    elements.passengerDetailsModal._element.addEventListener(
+      "hidden.bs.modal",
+      (event) => {
+        if (!event.target._programmaticClose) {
+          handleModalClose(event);
+        }
+      }
+    );
   }
-  if (seatInRow === 2 || seatInRow === 3) {
-    return "Aisle";
+
+  if (elements.bookingConfirmationModal?._element) {
+    elements.bookingConfirmationModal._element.addEventListener(
+      "hidden.bs.modal",
+      (event) => {
+        if (!event.target._programmaticClose) {
+          handleConfirmationModalClose(event);
+        }
+      }
+    );
   }
-  return "";
+
+  // Update the back button handler
+  const backButton = document.getElementById("backToDetails");
+  if (backButton) {
+    backButton.onclick = handleBackToDetails;
+  }
 }
 
-// Helper function to get seat properties
-function getSeatProperties(row, seatInRow, seatsPerRow, vipRows) {
-  const seatNumber = String((row - 1) * seatsPerRow + seatInRow);
-  const isVip = vipRows.includes(row);
-  const position = getSeatPosition(seatInRow, seatsPerRow);
-
-  return { seatNumber, isVip, position };
-}
-
-// Create the seat map
+// Seat Map Creation and Management
 function createSeatMap() {
-  if (!elements.seatMap) return;
-
-  const { totalRows, seatsPerRow, vipRows } = routeData.seatLayout;
-  elements.seatMap.innerHTML = ""; // Clear existing seats
-
-  // Get current date-time key
-  const dateTimeKey = `${elements.travelDateInput.value}_${elements.departureTimeSelect.value}`;
-  const bookedSeats = routeData.bookedSeats[dateTimeKey] || [];
-
-  // Create seats for each row
-  for (let row = 1; row <= totalRows; row++) {
-    createSeatsForRow(row, seatsPerRow, vipRows, bookedSeats);
-  }
-}
-
-// Helper function to create seats for a single row
-function createSeatsForRow(row, seatsPerRow, vipRows, bookedSeats) {
-  for (let seatInRow = 1; seatInRow <= seatsPerRow; seatInRow++) {
-    const { seatNumber, isVip, position } = getSeatProperties(
-      row,
-      seatInRow,
-      seatsPerRow,
-      vipRows
-    );
-    const isBooked = bookedSeats.includes(seatNumber);
-
-    const seat = createSeatElement(
-      seatNumber,
-      isVip ? "vip" : "regular",
-      position,
-      isBooked
-    );
-
-    elements.seatMap.appendChild(seat);
-  }
-}
-
-// Create individual seat element
-function createSeatElement(seatNumber, seatType, position, isBooked) {
-  const seat = document.createElement("div");
-  seat.className = `seat ${seatType}`;
-
-  // Add booked class if the seat is booked
-  if (isBooked) {
-    seat.classList.add("booked");
-  }
-
-  seat.dataset.seatNumber = seatNumber;
-  seat.dataset.seatType = seatType;
-  seat.dataset.position = position || "";
-
-  // Simplified inner structure - just the seat number
-  seat.innerHTML = `<span class="seat-number">${seatNumber}</span>`;
-
-  // Only add click event listener if seat is not booked
-  if (!isBooked) {
-    seat.addEventListener("click", handleSeatClick);
-  }
-
-  return seat;
-}
-
-// Submit booking
-async function submitBooking(form) {
-  const selectedSeats = Array.from(document.querySelectorAll(".seat.selected"))
-    .filter((seat) => seat.dataset.seatNumber && seat.dataset.seatType) // Filter out invalid seats
-    .map((seat) => ({
-      number: String(seat.dataset.seatNumber),
-      type: seat.dataset.seatType,
-      position: seat.dataset.position || "",
-    }));
-
-  console.log("Final Selected Seats:", selectedSeats);
-
-  if (selectedSeats.length === 0) {
-    throw new Error("Please select at least one seat");
-  }
-
-  const formData = new FormData(form);
-  const requestBody = {
-    routeId: routeData.id,
-    selectedSeats: selectedSeats,
-    departureTime: elements.departureTimeSelect.value,
-    travelDate: elements.travelDateInput.value,
-    fullName: formData.get("fullName"),
-    phone: formData.get("phone"),
-    email: formData.get("email"),
-  };
-
-  console.log("Request Body:", requestBody);
-
-  try {
-    const response = await fetch("/book", {
-      method: "POST",
-      headers: { "Content-Type": "application/json" },
-      body: JSON.stringify(requestBody),
-    });
-
-    const responseData = await response.json();
-    console.log("Response Data:", responseData);
-
-    if (!response.ok) {
-      throw new Error(responseData.error || "Booking failed");
-    }
-
-    if (responseData.html) {
-      document.body.innerHTML = responseData.html;
-      utils.showToast("Success", "Booking confirmed successfully!", "success");
-    }
-
-    return responseData;
-  } catch (error) {
-    console.error("Error:", error);
-    throw new Error(error.message || "Booking failed. Please try again.");
-  }
-}
-
-// Update selected seats information
-function updateSelectedSeats() {
-  const selectedSeats = Array.from(document.querySelectorAll('.seat.selected'))
-    .filter((seat) => seat.dataset.seatNumber && seat.dataset.seatType)
-    .map((seat) => ({
-      number: String(seat.dataset.seatNumber),
-      type: seat.dataset.seatType,
-      position: seat.dataset.position || "",
-    }));
-
-  // Double-check the limit here too
-  if (selectedSeats.length > 5) {  // Hardcode to 5 for guaranteed limit
-    utils.showToast('Error', 'Maximum 5 seats allowed per booking', 'error');
-    // Remove the last selected seat
-    const lastSelected = document.querySelector('.seat.selected:last-child');
-    if (lastSelected) {
-      lastSelected.classList.remove('selected');
-    }
+  if (!elements.seatMap || !routeData.seatLayout) {
+    console.warn("Cannot create seat map: missing required elements");
     return;
   }
 
-  // Update the UI with valid selection
-  if (elements.selectedSeatsInput) {
-    elements.selectedSeatsInput.value = JSON.stringify(selectedSeats);
-  }
+  const { totalRows, seatsPerRow, vipRows = [] } = routeData.seatLayout;
+  console.log("Creating seat map with:", { totalRows, seatsPerRow, vipRows });
 
-  if (elements.selectedSeatsDisplay) {
-    if (selectedSeats.length > 0) {
-      const seatsList = selectedSeats
-        .map((seat) => {
-          const seatType = seat.type.charAt(0).toUpperCase() + seat.type.slice(1);
-          const positionInfo = seat.position ? ` (${seat.position})` : "";
-          return `
-            <div class="selected-seat-item">
-              <div class="d-flex align-items-center gap-3">
-                <span class="seat-number">Seat ${seat.number}</span>
-                <span class="seat-type ${seat.type.toLowerCase()}">${seatType}${positionInfo}</span>
-              </div>
-              <button type="button" class="remove-seat" 
-                      data-seat-number="${seat.number}" 
-                      aria-label="Remove seat">
-                <i class="fas fa-trash-alt"></i>
-              </button>
-            </div>
-          `;
-        })
-        .join("");
+  let seatMapHTML = '<div class="seat-map-grid">';
 
-      elements.selectedSeatsDisplay.innerHTML = `
-        <div class="selected-seats-container">
-          <h6>
-            <i class="fas fa-chair me-2"></i>
-            Selected Seats (${selectedSeats.length}/${routeData.rules.maxSeatsPerBooking})
-          </h6>
-          <div class="selected-seats-list">
-            ${seatsList}
-          </div>
-        </div>
-      `;
-    } else {
-      elements.selectedSeatsDisplay.innerHTML = `
-        <div class="selected-seats-container">
-          <p class="text-muted mb-0">
-            <i class="fas fa-info-circle me-2"></i>
-            No seats selected
-          </p>
-        </div>
-      `;
+  for (let row = 1; row <= totalRows; row++) {
+    for (let seat = 1; seat <= seatsPerRow; seat++) {
+      const seatNumber = ((row - 1) * seatsPerRow + seat).toString();
+      const isVIP = vipRows.includes(row);
+      const seatType = isVIP ? "vip" : "regular";
+
+      console.log(`Creating seat ${seatNumber}:`, {
+        row,
+        seat,
+        isVIP,
+        seatType,
+      });
+
+      seatMapHTML += `
+              <div class="seat ${seatType}" 
+                   data-seat-number="${seatNumber}"
+                   data-seat-type="${seatType}"
+                   data-row="${row}"
+                   data-position="${getPosition(seat, seatsPerRow)}"
+                   data-is-vip="${isVIP}"
+                   title="Seat ${seatNumber} (${seatType.toUpperCase()})">
+                  ${seatNumber}
+              </div>`;
     }
   }
+  seatMapHTML += "</div>";
 
-  createPassengerDetailsForm(selectedSeats.length);
+  // Add the legend
+  seatMapHTML += createSeatLegend();
+
+  elements.seatMap.innerHTML = seatMapHTML;
+  attachSeatHandlers();
 }
 
-// Handle seat click
+function createSeatLegend() {
+  return `
+        <div class="seat-legend">
+            <div class="legend-item">
+                <div class="seat-demo regular"></div>
+                <span class="legend-text">Regular</span>
+            </div>
+            <div class="legend-item">
+                <div class="seat-demo vip"></div>
+                <span class="legend-text">VIP</span>
+            </div>
+            <div class="legend-item">
+                <div class="seat-demo selected"></div>
+                <span class="legend-text">Selected</span>
+            </div>
+            <div class="legend-item">
+                <div class="seat-demo booked"></div>
+                <span class="legend-text">Booked</span>
+            </div>
+        </div>`;
+}
+
+function attachSeatHandlers() {
+  document.querySelectorAll(".seat").forEach((seat) => {
+    console.log("Attaching handler to seat:", {
+      number: seat.getAttribute("data-seat-number"),
+      type: seat.getAttribute("data-seat-type"),
+      row: seat.getAttribute("data-row"),
+      isVIP: seat.getAttribute("data-is-vip"),
+    });
+
+    seat.addEventListener("click", handleSeatClick);
+  });
+}
+
 function handleSeatClick(event) {
   const seat = event.currentTarget;
-  
-  // Don't allow selection of booked seats
-  if (seat.classList.contains('booked')) {
+  const seatData = {
+    number: seat.getAttribute("data-seat-number"),
+    type: seat.getAttribute("data-seat-type"),
+    row: seat.getAttribute("data-row"),
+    isVIP: seat.getAttribute("data-is-vip"),
+  };
+
+  console.log("Clicked seat:", seatData);
+
+  // Validate seat data
+  if (!seatData.number || !seatData.type) {
+    console.error("Invalid seat data:", seatData);
     return;
   }
 
-  // If the seat is already selected, always allow deselection
-  if (seat.classList.contains('selected')) {
-    seat.classList.remove('selected');
-    updateSelectedSeats();
-    updatePriceCalculation();
-    updateBookingFormVisibility();
-    return;
-  }
+  if (!seat.classList.contains("booked")) {
+    // Check if seat is already selected
+    if (seat.classList.contains("selected")) {
+      seat.classList.remove("selected");
+    } else {
+      // Check max seats before adding new selection
+      const selectedSeats = getSelectedSeats();
+      const maxSeats = routeData.rules?.maxSeatsPerBooking || 5;
 
-  // Check current selection count BEFORE adding new seat
-  const currentSelectedCount = document.querySelectorAll('.seat.selected').length;
-
-  console.log("Current Selected Count:", currentSelectedCount);
-  
-  // Hard stop if we're at max seats
-  if (currentSelectedCount > 5) {  // Hardcode to 5 for guaranteed limit
-    utils.showToast('Maximum Seats', 'You can only select up to 5 seats per booking', 'error');
-    return;
-  }
-
-  // If we get here, we can select the new seat
-  seat.classList.add('selected');
-  updateSelectedSeats();
-  updatePriceCalculation();
-  updateBookingFormVisibility();
-}
-
-// Update price calculation
-function updatePriceCalculation() {
-  const selectedSeats = document.querySelectorAll(".seat.selected");
-  const vipPrice = routeData.seatLayout.prices.vip;
-  const regularPrice = routeData.seatLayout.prices.regular;
-
-  let vipCount = 0;
-  let regularCount = 0;
-
-  // Count selected seats by type
-  selectedSeats.forEach((seat) => {
-    if (seat.classList.contains("vip")) {
-      vipCount++;
-    } else if (seat.classList.contains("regular")) {
-      regularCount++;
+      if (selectedSeats.length >= maxSeats) {
+        utils.showToast(
+          "Error",
+          `Maximum ${maxSeats} seats allowed per booking`,
+          "error"
+        );
+        return;
+      }
+      seat.classList.add("selected");
     }
-  });
 
-  // Calculate totals
-  const vipTotal = vipCount * vipPrice;
-  const regularTotal = regularCount * regularPrice;
-
-  // Update display
-  if (elements.priceBreakdown) {
-    elements.priceBreakdown.vipCount.textContent = vipCount;
-    elements.priceBreakdown.regularCount.textContent = regularCount;
-    elements.priceBreakdown.vipTotal.textContent = vipTotal.toLocaleString();
-    elements.priceBreakdown.regularTotal.textContent =
-      regularTotal.toLocaleString();
-    elements.priceBreakdown.totalPrice.textContent = (
-      vipTotal + regularTotal
-    ).toLocaleString();
-  }
-
-  if (elements.totalAmountInput) {
-    elements.totalAmountInput.value = vipTotal + regularTotal;
+    // Update displays with price information
+    updateSelectedSeatsDisplay();
+    updateContinueButton();
   }
 }
 
-// Update seat availability based on selected date and time
-async function updateSeatAvailability() {
-  const dateTimeKey = `${elements.travelDateInput.value}_${elements.departureTimeSelect.value}`;
+function getPosition(seatInRow, seatsPerRow) {
+  if (seatInRow === 1) return "Window";
+  if (seatInRow === seatsPerRow) return "Window";
+  return "Aisle";
+}
 
-  try {
-    const response = await fetch("/api/check-seats", {
-      method: "POST",
-      headers: { "Content-Type": "application/json" },
-      body: JSON.stringify({
-        routeId: routeData.id,
-        dateTimeKey: dateTimeKey,
-      }),
-    });
+function getSelectedSeats() {
+  // Only get seats that have valid data attributes
+  return document.querySelectorAll(
+    ".seat.selected[data-seat-number][data-seat-type]"
+  );
+}
 
-    const data = await response.json();
-    if (data.success) {
-      // Update routeData with the latest booked seats
-      routeData.bookedSeats[dateTimeKey] = data.bookedSeats;
-      createSeatMap(); // Recreate the seat map with updated data
-    }
-  } catch (error) {
-    console.error("Error checking seat availability:", error);
+function updateContinueButton() {
+  if (elements.continueButton) {
+    elements.continueButton.disabled = getSelectedSeats().length === 0;
   }
 }
 
-// Create passenger details form
-function createPassengerDetailsForm(seatCount) {
-  const container = document.getElementById("passengerDetails");
-  if (!container) return;
+// Seat Selection Display and Updates
+function updateSelectedSeatsDisplay() {
+  if (!elements.selectedSeatsDisplay) {
+    console.warn("Selected seats display element not found");
+    return;
+  }
 
-  container.innerHTML = Array(seatCount)
-    .fill(null)
-    .map(
-      (_, i) => `
-        <div class="passenger-details mb-3">
-            <h6>Passenger ${i + 1}</h6>
-            <div class="row">
-                <div class="col-md-6">
-                    <input type="text" class="form-control" 
-                           name="passengers[${i}][name]" 
-                           required placeholder="Passenger Name">
-                </div>
-                <div class="col-md-6">
-                    <select class="form-select" name="passengers[${i}][type]" required>
-                        <option value="adult">Adult</option>
-                        <option value="child">Child (Under 12)</option>
-                    </select>
+  const selectedSeats = Array.from(getSelectedSeats());
+
+  if (selectedSeats.length === 0) {
+    elements.selectedSeatsDisplay.innerHTML = `
+            <div class="empty-seats-message">
+                <i class="fas fa-info-circle"></i>
+                <div class="message-content">
+                    <p>No seats selected</p>
+                    <small>Click on available seats to select them</small>
                 </div>
             </div>
-        </div>
-    `
-    )
+        `;
+    updateTotalAmount(selectedSeats);
+    return;
+  }
+
+  const seatsHTML = selectedSeats
+    .map((seat) => {
+      const seatNumber = seat.getAttribute("data-seat-number");
+      const isVIP = seat.getAttribute("data-is-vip") === "true";
+      const position = seat.getAttribute("data-position");
+      const price = isVIP
+        ? routeData.seatLayout.prices.vip
+        : routeData.seatLayout.prices.regular;
+
+      return `
+            <div class="selected-seat-item ${isVIP ? "vip" : "regular"}">
+                <div class="seat-number">
+                    <i class="fas fa-chair"></i>
+                    <span>Seat ${seatNumber}</span>
+                </div>
+                <div class="seat-details">
+                    <span class="seat-type-badge">
+                        ${isVIP ? "VIP" : "Regular"}
+                    </span>
+                    <span class="seat-position">${position}</span>
+                    <span class="seat-price">KES ${price.toLocaleString()}</span>
+                </div>
+            </div>
+        `;
+    })
     .join("");
+
+  elements.selectedSeatsDisplay.innerHTML = `
+        <div class="selected-seats-grid">
+            ${seatsHTML}
+        </div>
+        <div class="price-breakdown mt-3">
+            <div class="breakdown-item">
+                <span>VIP Seats <span class="seat-count">${
+                  selectedSeats.filter(
+                    (s) => s.getAttribute("data-is-vip") === "true"
+                  ).length
+                }</span></span>
+                <span>KES ${elements.vipTotalDisplay?.textContent || "0"}</span>
+            </div>
+            <div class="breakdown-item">
+                <span>Regular Seats <span class="seat-count">${
+                  selectedSeats.filter(
+                    (s) => s.getAttribute("data-is-vip") === "false"
+                  ).length
+                }</span></span>
+                <span>KES ${
+                  elements.regularTotalDisplay?.textContent || "0"
+                }</span>
+            </div>
+            <div class="breakdown-item total">
+                <span>Total Amount</span>
+                <span>KES ${
+                  elements.totalPriceDisplay?.textContent || "0"
+                }</span>
+            </div>
+        </div>
+    `;
+
+  updateTotalAmount(selectedSeats);
 }
 
-// Setup form validation
-function setupFormValidation() {
-  const form = document.getElementById("reservationForm");
-  if (!form) return;
+function updateTotalAmount(selectedSeats) {
+  // Count VIP and regular seats
+  const vipSeats = selectedSeats.filter(
+    (seat) => seat.getAttribute("data-is-vip") === "true"
+  );
+  const regularSeats = selectedSeats.filter(
+    (seat) => seat.getAttribute("data-is-vip") === "false"
+  );
 
-  // Add validation to required inputs
-  form.querySelectorAll("input[required]").forEach((input) => {
-    input.addEventListener("input", function () {
-      this.classList.toggle("is-valid", this.value.trim() !== "");
-      this.classList.toggle("is-invalid", this.value.trim() === "");
-    });
+  // Update counts with null checks
+  if (elements.vipCountDisplay) {
+    elements.vipCountDisplay.textContent = vipSeats.length;
+  }
+  if (elements.regularCountDisplay) {
+    elements.regularCountDisplay.textContent = regularSeats.length;
+  }
+
+  // Calculate totals
+  const vipTotal = vipSeats.length * routeData.seatLayout.prices.vip;
+  const regularTotal =
+    regularSeats.length * routeData.seatLayout.prices.regular;
+  const totalAmount = vipTotal + regularTotal;
+
+  // Update price displays with null checks
+  if (elements.vipTotalDisplay) {
+    elements.vipTotalDisplay.textContent = vipTotal.toLocaleString();
+  }
+  if (elements.regularTotalDisplay) {
+    elements.regularTotalDisplay.textContent = regularTotal.toLocaleString();
+  }
+  if (elements.totalPriceDisplay) {
+    elements.totalPriceDisplay.textContent = totalAmount.toLocaleString();
+  }
+
+  console.log("Price breakdown:", {
+    vipSeats: vipSeats.length,
+    regularSeats: regularSeats.length,
+    vipTotal,
+    regularTotal,
+    totalAmount,
+  });
+}
+
+// Also update the updateSeatDisplay function to include null checks
+function updateSeatDisplay(bookedSeats = []) {
+  if (!elements.seatMap) {
+    console.warn("Seat map not found");
+    return;
+  }
+
+  const seats = document.querySelectorAll(".seat");
+  seats.forEach((seat) => {
+    const seatNumber = seat.getAttribute("data-seat-number");
+    if (bookedSeats.includes(seatNumber)) {
+      seat.classList.add("booked");
+      seat.classList.remove("selected");
+    } else {
+      seat.classList.remove("booked");
+    }
   });
 
-  // Handle form submission
-  form.addEventListener("submit", handleFormSubmission);
+  // Update selected seats display as booked seats might have been deselected
+  updateSelectedSeatsDisplay();
 }
 
-// Handle form submission
-async function handleFormSubmission(e) {
-  e.preventDefault();
+// Seat Availability Updates
+async function updateSeatAvailability() {
+  try {
+    const date = elements.travelDateInput.value;
+    const time = elements.departureTimeSelect.value;
 
-  if (!utils.validateForm(this)) {
+    if (!date || !time) {
+      console.warn("Date or time not selected");
+      return;
+    }
+
+    const dateTimeKey = `${date}_${time}`;
+    console.log("Checking availability for:", dateTimeKey);
+
+    // Reset all selected seats first
+    resetSelectedSeats();
+
+    const response = await fetch(
+      `/api/check-seats/${routeData.id}/${dateTimeKey}`
+    );
+    if (!response.ok) {
+      throw new Error(`HTTP error! status: ${response.status}`);
+    }
+
+    const data = await response.json();
+
+    if (data.success) {
+      updateSeatDisplay(data.bookedSeats);
+    } else {
+      throw new Error(data.error || "Failed to get seat availability");
+    }
+  } catch (error) {
+    console.error("Error updating seat availability:", error);
+    utils.showToast("Error", "Failed to update seat availability", "error");
+  }
+}
+
+// Add a new function to reset selected seats
+function resetSelectedSeats() {
+  // Remove selected class from all seats
+  document.querySelectorAll(".seat.selected").forEach((seat) => {
+    seat.classList.remove("selected");
+  });
+
+  // Reset the selected seats display
+  updateSelectedSeatsDisplay();
+
+  // Reset the continue button state
+  updateContinueButton();
+}
+
+// Booking Process Handlers
+function handleContinueToDetails() {
+  const selectedSeats = getSelectedSeats();
+  if (selectedSeats.length === 0) {
+    utils.showToast("Error", "Please select at least one seat", "error");
+    return;
+  }
+
+  // Update the hidden input with selected seats
+  const selectedSeatsInput = document.getElementById("selectedSeatsInput");
+  if (selectedSeatsInput) {
+    const seatsData = Array.from(selectedSeats).map((seat) => ({
+      number: seat.getAttribute("data-seat-number"),
+      type: seat.getAttribute("data-seat-type"),
+      isVIP: seat.getAttribute("data-is-vip") === "true",
+    }));
+
+    // Debug log
+    console.log("Selected Seats Data:", seatsData);
+
+    selectedSeatsInput.value = JSON.stringify(seatsData);
+  }
+
+  elements.passengerDetailsModal?.show();
+}
+
+function handleConfirmDetails(event) {
+  event.preventDefault();
+
+  if (!elements.passengerForm) {
+    console.error("Passenger form not found");
+    return;
+  }
+
+  if (!utils.validateForm(elements.passengerForm)) {
     utils.showToast("Error", "Please fill in all required fields", "error");
     return;
   }
 
-  utils.showLoading();
+  const formData = new FormData(elements.passengerForm);
+  const selectedSeats = Array.from(getSelectedSeats()).map((seat) => ({
+    number: seat.getAttribute("data-seat-number"),
+    type: seat.getAttribute("data-seat-type"),
+    isVIP: seat.getAttribute("data-is-vip") === "true",
+  }));
+
+  const bookingData = {
+    routeId: routeData.id,
+    travelDate: elements.travelDateInput.value,
+    departureTime: elements.departureTimeSelect.value,
+    seats: selectedSeats,
+    passengerDetails: Object.fromEntries(formData),
+  };
+
+  submitBooking(bookingData);
+}
+
+async function submitBooking(bookingData) {
   try {
-    const response = await submitBooking(this);
-    handleBookingResponse(response);
+    utils.showLoading();
+
+    console.log("Submitting booking data:", bookingData);
+
+    const response = await fetch("/api/bookings", {
+      method: "POST",
+      headers: {
+        "Content-Type": "application/json",
+      },
+      body: JSON.stringify(bookingData),
+    });
+
+    const data = await response.json();
+
+    if (!response.ok) {
+      console.error("Server response:", data);
+      throw new Error(data.error || "Booking failed");
+    }
+
+    // Hide the confirmation modal
+    elements.bookingConfirmationModal?.hide();
+
+    // Redirect to the booking confirmation page
+    window.location.href = `/booking-confirmation/${data.booking.id}`;
   } catch (error) {
-    utils.showToast("Error", error.message, "error");
+    console.error("Booking error:", error);
+    utils.showToast(
+      "Error",
+      error.message || "Failed to complete booking",
+      "error"
+    );
   } finally {
     utils.hideLoading();
   }
 }
 
-// Handle return journey checkbox
-function handleReturnJourney() {
-  const returnDetails = document.getElementById("returnJourneyDetails");
-  if (!returnDetails) return;
-
-  returnDetails.style.display = this.checked ? "block" : "none";
-
-  if (this.checked) {
-    const minReturnDate = new Date();
-    minReturnDate.setDate(minReturnDate.getDate() + 1);
-    document.getElementById("returnDate").min = minReturnDate
-      .toISOString()
-      .split("T")[0];
+// Modal Handlers
+function handleModalClose(event) {
+  // If we're handling a programmatic close (not user clicking X or backdrop), don't reset
+  if (event && event.target._programmaticClose) {
+    return;
   }
 
-  updatePriceCalculation();
-}
-
-// Handle booking response
-function handleBookingResponse(response) {
-  if (response.html) {
-    document.body.innerHTML = response.html;
-  }
-  utils.showToast("Success", "Booking confirmed successfully!", "success");
-}
-
-// Update booking form visibility
-function updateBookingFormVisibility() {
-  if (elements.bookingForm) {
-    const hasSelectedSeats =
-      document.querySelectorAll(".seat.selected").length > 0;
-    elements.bookingForm.style.display = hasSelectedSeats ? "block" : "none";
+  // Only reset the form if it's a user-initiated close
+  if (elements.passengerForm) {
+    elements.passengerForm.reset();
   }
 }
 
-document.getElementById('reservationForm')?.addEventListener('submit', async function(e) {
-    e.preventDefault();
-    
-    // Get form inputs
-    const form = this;
-    const nameInput = form.querySelector('[name="fullName"]');
-    const phoneInput = form.querySelector('[name="phone"]');
-    const emailInput = form.querySelector('[name="email"]');
-    const routeIdInput = form.querySelector('[name="routeId"]');
-    const selectedSeatsInput = form.querySelector('[name="selectedSeats"]');
-    const departureTimeInput = document.getElementById('departureTime');
-    const travelDateInput = document.getElementById('travelDate');
+function handleConfirmationModalClose(event) {
+  // If we're handling a programmatic close (not user clicking X or backdrop), do nothing
+  if (event && event.target._programmaticClose) {
+    return;
+  }
 
-    // Validate all required fields
-    let isValid = utils.validateForm(form);
+  // Just close the modal, no reload needed
+  elements.bookingConfirmationModal?.hide();
+}
 
-    // Additional validation
-    if (isValid) {
-        if (!validation.validate.name(nameInput.value)) {
-            utils.showToast('Error', validation.errors.name, 'error');
-            isValid = false;
-        }
-        if (!validation.validate.phone(phoneInput.value)) {
-            utils.showToast('Error', validation.errors.phone, 'error');
-            isValid = false;
-        }
-        if (!validation.validate.email(emailInput.value)) {
-            utils.showToast('Error', validation.errors.email, 'error');
-            isValid = false;
-        }
+function showBookingConfirmation(bookingData) {
+  // Implementation depends on your UI requirements
+  elements.bookingConfirmationModal?.show();
+}
+
+// Add form submission handler
+function setupFormHandlers() {
+  const reservationForm = document.getElementById("reservationForm");
+  if (reservationForm) {
+    reservationForm.addEventListener("submit", (event) => {
+      event.preventDefault();
+      event.stopPropagation();
+
+      if (!reservationForm.checkValidity()) {
+        reservationForm.classList.add("was-validated");
+        return;
+      }
+
+      const formData = new FormData(reservationForm);
+      const bookingData = {
+        routeId: routeData.id,
+        travelDate: elements.travelDateInput.value,
+        departureTime: elements.departureTimeSelect.value,
+        seats: JSON.parse(document.getElementById("selectedSeatsInput").value),
+        passengerDetails: {
+          fullName: formData.get("fullName"),
+          phone: formData.get("phone"),
+          email: formData.get("email"),
+        },
+      };
+
+      showBookingConfirmationModal(bookingData);
+    });
+  }
+}
+
+// Add function to show booking confirmation modal
+function showBookingConfirmationModal(bookingData) {
+  elements.passengerDetailsModal?.hide();
+
+  const modalDialog = document.querySelector(
+    "#bookingConfirmationModal .modal-dialog"
+  );
+  if (modalDialog) {
+    modalDialog.classList.add("modal-lg");
+  }
+
+  const modalBody = document.querySelector(
+    "#bookingConfirmationModal .modal-body"
+  );
+  if (modalBody) {
+    // Create a better formatted seats display with grid layout
+    const seatsDisplay = bookingData.seats
+      .map(
+        (seat) => `
+            <div class="selected-seat-tag ${seat.isVIP ? "vip" : "regular"}">
+                <div class="seat-info">
+                    <i class="fas fa-chair"></i>
+                    <span>Seat ${seat.number}</span>
+                </div>
+                <span class="seat-type-badge">
+                    ${seat.isVIP ? "VIP" : "Regular"}
+                </span>
+            </div>
+        `
+      )
+      .join("");
+
+    modalBody.innerHTML = `
+            <div class="booking-summary">
+                <h4 class="mb-4"><i class="fas fa-ticket-alt me-2"></i>Booking Summary</h4>
+                <div class="summary-grid">
+                    <div class="row g-4">
+                        <div class="col-md-6">
+                            <div class="summary-item">
+                                <h6><i class="fas fa-route"></i>Route</h6>
+                                <p>${routeData.from} → ${routeData.to}</p>
+                                <small class="text-muted">Express Service</small>
+                            </div>
+                        </div>
+                        <div class="col-md-6">
+                            <div class="summary-item">
+                                <h6><i class="fas fa-calendar"></i>Travel Date</h6>
+                                <p>${new Date(
+                                  bookingData.travelDate
+                                ).toLocaleDateString("en-US", {
+                                  weekday: "long",
+                                  year: "numeric",
+                                  month: "long",
+                                  day: "numeric",
+                                })}</p>
+                                <small class="text-muted">${
+                                  bookingData.departureTime
+                                }</small>
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="row g-4 mt-2">
+                        <div class="col-md-6">
+                            <div class="summary-item">
+                                <h6><i class="fas fa-user"></i>Passenger Details</h6>
+                                <p>${bookingData.passengerDetails.fullName}</p>
+                                <small class="text-muted">${
+                                  bookingData.passengerDetails.phone
+                                }</small>
+                                <small class="text-muted d-block">${
+                                  bookingData.passengerDetails.email
+                                }</small>
+                            </div>
+                        </div>
+                        <div class="col-md-6">
+                            <div class="summary-item seats-summary">
+                                <h6><i class="fas fa-chair"></i>Selected Seats</h6>
+                                <div class="selected-seats-tags">
+                                    ${seatsDisplay}
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="price-summary mt-4">
+                        <div class="price-details">
+                            <div class="price-row">
+                                <span>VIP Seats (${
+                                  bookingData.seats.filter((s) => s.isVIP)
+                                    .length
+                                })</span>
+                                <span>KES ${
+                                  elements.vipTotalDisplay?.textContent || "0"
+                                }</span>
+                            </div>
+                            <div class="price-row">
+                                <span>Regular Seats (${
+                                  bookingData.seats.filter((s) => !s.isVIP)
+                                    .length
+                                })</span>
+                                <span>KES ${
+                                  elements.regularTotalDisplay?.textContent ||
+                                  "0"
+                                }</span>
+                            </div>
+                        </div>
+                        <div class="total-price">
+                            <h6 class="text-white mb-2">Total Amount</h6>
+                            <p class="h4 mb-0">KES ${
+                              elements.totalPriceDisplay?.textContent || "0"
+                            }</p>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        `;
+  }
+
+  // Add event listener to the back button
+  const backButton = document.querySelector(
+    "#bookingConfirmationModal .btn-secondary"
+  );
+  if (backButton) {
+    backButton.onclick = handleBackToDetails;
+  }
+
+  elements.bookingConfirmationModal._bookingData = bookingData;
+  elements.bookingConfirmationModal?.show();
+}
+
+// Update the confirm booking handler
+function handleConfirmBooking() {
+  const bookingData = elements.bookingConfirmationModal._bookingData;
+  if (!bookingData) {
+    console.error("No booking data found");
+    return;
+  }
+
+  submitBooking(bookingData);
+}
+
+// Export necessary functions if needed
+window.handleConfirmDetails = handleConfirmDetails;
+window.handleContinueToDetails = handleContinueToDetails;
+window.handleBackToDetails = handleBackToDetails;
+
+// Add this function to set default date
+function setDefaultDate() {
+  if (elements.travelDateInput) {
+    const today = new Date();
+    const yyyy = today.getFullYear();
+    const mm = String(today.getMonth() + 1).padStart(2, "0");
+    const dd = String(today.getDate()).padStart(2, "0");
+    const formattedDate = `${yyyy}-${mm}-${dd}`;
+
+    elements.travelDateInput.value = formattedDate;
+    elements.travelDateInput.min = formattedDate; // Prevent past dates
+
+    // Check available times immediately on page load
+    checkAndUpdateAvailableTimes();
+  }
+}
+
+// Add the missing handleBackToDetails function
+function handleBackToDetails(event) {
+  if (event) {
+    event.preventDefault();
+  }
+
+  // Mark as programmatic close to prevent reload
+  if (elements.bookingConfirmationModal?._element) {
+    elements.bookingConfirmationModal._element._programmaticClose = true;
+  }
+
+  // Hide confirmation modal and show passenger details modal
+  elements.bookingConfirmationModal?.hide();
+  elements.passengerDetailsModal?.show();
+
+  // Reset the programmatic flag
+  if (elements.bookingConfirmationModal?._element) {
+    elements.bookingConfirmationModal._element._programmaticClose = false;
+  }
+}
+
+// Update checkAndUpdateAvailableTimes function
+function checkAndUpdateAvailableTimes() {
+  if (!elements.departureTimeSelect) return;
+
+  const selectedDate = new Date(elements.travelDateInput.value);
+  const dayOfWeek = selectedDate
+    .toLocaleDateString("en-US", { weekday: "long" })
+    .toLowerCase();
+
+  // Get times for selected day from schedule
+  const availableTimes = routeData.schedule[dayOfWeek] || [];
+
+  // Clear existing options
+  elements.departureTimeSelect.innerHTML = "";
+
+  const now = new Date();
+  const isToday = selectedDate.toDateString() === now.toDateString();
+
+  // Filter and add valid times
+  let hasValidTimes = false;
+
+  if (isToday) {
+    // For today, filter times that are at least 1 hour in the future
+    const currentHour = now.getHours();
+    const currentMinute = now.getMinutes();
+    const currentTotalMinutes = currentHour * 60 + currentMinute;
+
+    availableTimes.forEach((time) => {
+      const [hours, minutes] = time.split(":").map(Number);
+      const departureMinutes = hours * 60 + minutes;
+
+      if (departureMinutes >= currentTotalMinutes + 60) {
+        const option = new Option(time, time);
+        elements.departureTimeSelect.add(option);
+        hasValidTimes = true;
+      }
+    });
+  } else {
+    // For future dates, add all times
+    availableTimes.forEach((time) => {
+      const option = new Option(time, time);
+      elements.departureTimeSelect.add(option);
+      hasValidTimes = true;
+    });
+  }
+
+  // Update UI based on availability
+  if (!hasValidTimes) {
+    // Show no buses available message
+    if (elements.seatMap) {
+      elements.seatMap.innerHTML = `
+                <div class="alert alert-warning text-center my-4">
+                    <i class="fas fa-exclamation-triangle me-2"></i>
+                    No available buses for ${
+                      isToday ? "today" : "the selected date"
+                    }. Please select a different date.
+                </div>
+            `;
     }
 
-    if (!isValid) {
-        return false;
-    }
+    // Disable controls
+    elements.departureTimeSelect.innerHTML =
+      "<option disabled>No available times</option>";
+    elements.departureTimeSelect.setAttribute("disabled", "disabled");
+    elements.continueButton?.setAttribute("disabled", "disabled");
 
-    // Prepare booking data
-    const bookingData = {
-        routeId: routeIdInput.value,
-        selectedSeats: JSON.parse(selectedSeatsInput.value),
-        departureTime: departureTimeInput.value,
-        travelDate: travelDateInput.value,
-        fullName: validation.sanitize.string(nameInput.value.trim()),
-        phone: validation.sanitize.phone(phoneInput.value.trim()),
-        email: validation.sanitize.email(emailInput.value.trim())
-    };
+    // Reset any selected seats
+    resetSelectedSeats();
+  } else {
+    // Re-enable controls and update seat map
+    elements.departureTimeSelect.removeAttribute("disabled");
+    elements.continueButton?.removeAttribute("disabled");
+    createSeatMap();
+    updateSeatAvailability();
+  }
+}
 
-    utils.showLoading();
-    
-    try {
-        const response = await fetch('/book', {
-            method: 'POST',
-            headers: {
-                'Content-Type': 'application/json'
-            },
-            body: JSON.stringify(bookingData)
+// Contact form handler
+document.addEventListener('DOMContentLoaded', function() {
+    const contactForm = document.getElementById('contactForm');
+    if (contactForm) {
+        contactForm.addEventListener('submit', async function(e) {
+            e.preventDefault();
+            const submitBtn = this.querySelector('button[type="submit"]');
+            const originalText = submitBtn.innerHTML;
+            
+            try {
+                submitBtn.innerHTML = '<span class="spinner-border spinner-border-sm"></span> Sending...';
+                submitBtn.disabled = true;
+                
+                // Add your contact form submission logic here
+                utils.showToast('Success', 'Message sent successfully!', 'success');
+                this.reset();
+            } catch (error) {
+                utils.showToast('Error', 'Failed to send message', 'error');
+            } finally {
+                submitBtn.innerHTML = originalText;
+                submitBtn.disabled = false;
+            }
         });
-
-        const data = await response.json();
-        
-        if (!response.ok) {
-            throw new Error(data.error || 'Booking failed');
-        }
-
-        // Show success message
-        utils.showToast('Success', 'Booking confirmed!', 'success');
-        
-        // Wait for toast to be visible
-        await new Promise(resolve => setTimeout(resolve, 1000));
-        
-        // Redirect to confirmation page
-        if (data.booking?.id) {
-            window.location.href = `/booking-confirmation/${data.booking.id}`;
-        } else {
-            throw new Error('Invalid booking response');
-        }
-
-    } catch (error) {
-        utils.showToast('Error', error.message, 'error');
-    } finally {
-        utils.hideLoading();
     }
 });

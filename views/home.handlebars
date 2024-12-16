@@ -1,52 +1,51 @@
-<div class="container">
-    <h1>Available Routes</h1>
-    
-    <div class="row mb-3">
-        <div class="col-md-3">
-            <input type="text" id="searchInput" class="form-control" placeholder="Search routes...">
-        </div>
-        <div class="col-md-3">
-            <select id="timeFilter" class="form-select">
-                <option value="">All Times</option>
-                <option value="morning">Morning (6AM-12PM)</option>
-                <option value="afternoon">Afternoon (12PM-6PM)</option>
-                <option value="evening">Evening (After 6PM)</option>
-            </select>
-        </div>
-        <div class="col-md-3">
-            <select id="priceFilter" class="form-select">
-                <option value="">All Prices</option>
-                <option value="501-1000">KES 501-1000</option>
-                <option value="1001+">KES 1001+</option>
-            </select>
+<div class="hero-section">
+    <div class="hero-overlay"></div>
+    <div class="hero-content">
+        <div class="container text-center">
+            <h1 class="hero-title">Welcome to EASEBUS</h1>
+            <p class="hero-subtitle">Your Journey, Our Priority</p>
+            <div class="hero-cta">
+                <a href="/routes" class="btn btn-primary btn-lg me-3">
+                    <i class="fas fa-route me-2"></i>Explore Routes
+                </a>
+                <a href="/verify" class="btn btn-outline-light btn-lg">
+                    <i class="fas fa-ticket-alt me-2"></i>Verify Ticket
+                </a>
+            </div>
         </div>
     </div>
+</div>
 
-    <div id="routesContainer" class="row">
-        {{#each routes}}
-        <div class="col-md-4 mb-4 route-card">
-            <div class="card">
-                <div class="card-body">
-                    <h5 class="card-title">{{from}} to {{to}}</h5>
-                    <p class="card-text">
-                        <strong>Regular Price:</strong> <span class="regular-price">{{seatLayout.prices.regular}}</span><br>
-                        <strong>VIP Price:</strong> KES {{seatLayout.prices.vip}}<br>
-                        <strong>Departure Times:</strong><br>
-                        {{#each schedule.monday}}
-                            <span class="badge bg-primary">{{this}}</span>
-                        {{/each}}
-                    </p>
-                    <a href="/route/{{id}}" class="btn btn-primary">View Details</a>
+<div class="features-section">
+    <div class="container">
+        <div class="row g-4">
+            <div class="col-md-4">
+                <div class="feature-card">
+                    <div class="feature-icon">
+                        <i class="fas fa-map-marked-alt"></i>
+                    </div>
+                    <h3>Nationwide Coverage</h3>
+                    <p>Connecting all major cities and towns across Kenya with reliable bus services.</p>
+                </div>
+            </div>
+            <div class="col-md-4">
+                <div class="feature-card">
+                    <div class="feature-icon">
+                        <i class="fas fa-clock"></i>
+                    </div>
+                    <h3>24/7 Support</h3>
+                    <p>Round-the-clock customer support to assist you with your travel needs.</p>
+                </div>
+            </div>
+            <div class="col-md-4">
+                <div class="feature-card">
+                    <div class="feature-icon">
+                        <i class="fas fa-shield-alt"></i>
+                    </div>
+                    <h3>Safe Travel</h3>
+                    <p>Your safety is our top priority with professional drivers and well-maintained buses.</p>
                 </div>
             </div>
         </div>
-        {{/each}}
     </div>
-    
-    <div id="noResults" class="alert alert-info mt-3" style="display: none;">
-        <i class="fas fa-info-circle me-2"></i>
-        <span id="noResultsMessage">No routes found. Try adjusting your filters.</span>
-    </div>
-
-    <script src="/js/search.js"></script>
 </div> 
